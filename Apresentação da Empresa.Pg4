@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAMPEPAR</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background-color: #ffcc00;
+            padding: 20px;
+        }
+        .header img {
+            width: 150px;
+        }
+        .content {
+            margin: 20px;
+        }
+        .highlight {
+            font-weight: bold;
+            font-size: 20px;
+        }
+        .price {
+            margin-top: 10px;
+            font-size: 18px;
+            color: green;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="logo-fampepar.png" alt="FAMPEPAR Logo">
+        <h1>FAMPEPAR</h1>
+        <p>Federação das Associações de Micro e Pequenas Empresas e Empreendedores Individuais do Estado do Paraná</p>
+    </div>
+    <div class="content">
+        <p>Somos uma empresa de vender pirulito e bombom e estamos em busca de investimento e network.</p>
+        <p class="price">Valor: $15 por 10% da empresa</p>
+    </div>
+</body>
+</html>
