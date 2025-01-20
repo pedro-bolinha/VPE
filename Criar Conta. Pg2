@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Conta</title>
+</head>
+<body style="font-family: Arial, sans-serif; margin: 0; padding: 0;">
+    <div style="text-align: center; padding: 20px;">
+        <button style="background: none; border: none; cursor: pointer;">⬅</button>
+        <h2>Criar Conta</h2>
+        <p>Já tem uma conta? <a href="#">Faça login!</a></p>
+        <form style="width: 90%; max-width: 400px; margin: 0 auto;">
+            <input type="text" placeholder="Nome" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px;">
+            <input type="email" placeholder="Email" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px;">
+            <input type="password" placeholder="Senha" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px;">
+            <input type="date" placeholder="Data de Nascimento" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px;">
+            <button style="width: 100%; padding: 10px; background-color: black; color: white; border: none; border-radius: 5px;">Criar</button>
+        </form>
+    </div>
+</body>
+</html>
