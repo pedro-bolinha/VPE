@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Empresas</title>
+</head>
+<body style="font-family: Arial, sans-serif; margin: 0; padding: 0;">
+    <div style="padding: 20px;">
+        <input type="text" placeholder="Buscar" style="width: 90%; max-width: 400px; padding: 10px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 5px;">
+        <div>
+            <h3>Empresas em Destaque</h3>
+            <div style="border-bottom: 1px solid #ccc; padding: 10px 0;">
+                <img src="logo1.jpg" alt="Fampepar" style="width: 50px;">
+                <p>Fampepar - busco ajuda de investidores</p>
+                <p>$15.00</p>
+            </div>
+            <div style="border-bottom: 1px solid #ccc; padding: 10px 0;">
+                <img src="logo2.jpg" alt="Conampe" style="width: 50px;">
+                <p>Conampe - busco ajuda de investidores</p>
+                <p>$15.00</p>
+            </div>
+            <div>
+                <img src="logo3.jpg" alt="UNI" style="width: 50px;">
+                <p>UNI - busco ajuda de investidores</p>
+                <p>$15.00</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
