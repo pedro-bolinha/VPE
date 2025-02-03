@@ -11,19 +11,19 @@
         <div>
             <h3>Empresas em Destaque</h3>
             <div style="border-bottom: 1px solid #ccc; padding: 10px 0;">
-                <img src="logo1.jpg" alt="Fampepar" style="width: 50px;">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThdm500SGyX7t-_1Ux9F7F68r2STyLh1Pq-g&s" alt="Fampepar" style="width: 100px;">
                 <p>Fampepar - busco ajuda de investidores</p>
                 <p>$15.00</p>
             </div>
             <div style="border-bottom: 1px solid #ccc; padding: 10px 0;">
-                <img src="logo2.jpg" alt="Conampe" style="width: 50px;">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJXmWpeHoXxF9GzwEOHk16bbK_du3KYYnOZw&s" alt="Conampe" style="width: 100px;">
                 <p>Conampe - busco ajuda de investidores</p>
                 <p>$15.00</p>
             </div>
             <div>
-                <img src="logo3.jpg" alt="UNI" style="width: 50px;">
-                <p>UNI - busco ajuda de investidores</p>
-                <p>$15.00</p>
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5tfdAEg8d9TNopHjLjiYQrGb_c_kBHRgw2Q&s" alt="Bookery" style="width: 100px;">
+                <p>Bookery - busco ajuda de investidores</p>
+                <p>$5.00</p>
             </div>
         </div>
     </div>
