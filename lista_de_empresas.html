@@ -1,31 +1,116 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Empresas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f8f8;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            width: 90%;
+            max-width: 600px;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .search-box {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .search-box button {
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .company {
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+        .company img {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+        .company-info {
+            flex-grow: 1;
+        }
+        .company h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+        .favorite {
+            cursor: pointer;
+            font-size: 20px;
+        }
+        .cart {
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        .buy-button {
+            width: 100%;
+            padding: 15px;
+            background: black;
+            color: white;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
 </head>
-<body style="font-family: Arial, sans-serif; margin: 0; padding: 0;">
-    <div style="padding: 20px;">
-        <input type="text" placeholder="Buscar" style="width: 90%; max-width: 400px; padding: 10px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 5px;">
-        <div>
-            <h3>Empresas em Destaque</h3>
-            <div style="border-bottom: 1px solid #ccc; padding: 10px 0;">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcThdm500SGyX7t-_1Ux9F7F68r2STyLh1Pq-g&s" alt="Fampepar" style="width: 100px;">
-                <p>Fampepar - busco ajuda de investidores</p>
-                <p>$15.00</p>
-            </div>
-            <div style="border-bottom: 1px solid #ccc; padding: 10px 0;">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJXmWpeHoXxF9GzwEOHk16bbK_du3KYYnOZw&s" alt="Conampe" style="width: 100px;">
-                <p>Conampe - busco ajuda de investidores</p>
-                <p>$15.00</p>
-            </div>
-            <div>
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5tfdAEg8d9TNopHjLjiYQrGb_c_kBHRgw2Q&s" alt="Bookery" style="width: 100px;">
-                <p>Bookery - busco ajuda de investidores</p>
-                <p>$5.00</p>
-            </div>
+<body>
+    <div class="container">
+        <div class="search-box">
+            <input type="text" placeholder="Buscar">
+            <button>🔍</button>
         </div>
+        <div class="company">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoy52p2mrOdpNsOCDcWBENIIxbRR0JNDYcGw&s" alt="Fampepar">
+            <div class="company-info">
+                <h3>Fampepar</h3>
+                <p>busco ajuda de investidores</p>
+            </div>
+            <span class="favorite">❤️</span>
+            <span class="cart">🛒</span>
+            <span>$15.00</span>
+        </div>
+        <div class="company">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxBBgVT1pqS_VFkfMz47zqEGZz-sCClNstQA&s" alt="Conampe">
+            <div class="company-info">
+                <h3>Conampe</h3>
+                <p>busco ajuda de investidores</p>
+            </div>
+            <span class="favorite">🤍</span>
+            <span class="cart">🛒</span>
+            <span>$15.00</span>
+        </div>
+        <div class="company">
+            <img src="https://cdn.worldvectorlogo.com/logos/uni-filter.svg" alt="UNI">
+            <div class="company-info">
+                <h3>UNI</h3>
+                <p>busco ajuda de investidores</p>
+            </div>
+            <span class="favorite">🤍</span>
+            <span class="cart">🛒</span>
+            <span>$15.00</span>
+        </div>
+        <button class="buy-button">Comprar</button>
     </div>
 </body>
 </html>
+
