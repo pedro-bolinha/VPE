@@ -1,3 +1,25 @@
+const empresas = [
+    {
+        name: '',
+        descricao: '',
+        img: '',
+        preco: ''
+    },
+    {
+        name: '',
+        descricao: '',
+        img: '',
+        preco: ''
+        
+    },
+    {   
+        name: "",
+        descricao: '',
+        img: '',
+        preco: ''
+    }
+]
+
 document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.querySelector('.search-box input');
     const companies = document.querySelectorAll('.company');
@@ -33,6 +55,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Comprar
     buyButton.addEventListener('click', () => {
         if (cartCount > 0) {
+            alert(`Compra realizada com sucesso! Total de empresas: ${cartCount}`);
+            cartCount = 0;
+        } else {
+            alert('Adicione ao menos uma empresa ao carrinho antes de comprar.');
+        }
+    });
+});
+
             alert(`Compra realizada com sucesso! Total de empresas: ${cartCount}`);
             cartCount = 0;
         } else {
