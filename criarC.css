@@ -1,0 +1,45 @@
+body {
+    background-color: rgb(12, 12, 12);
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+title, h2, p {
+    color: #ccc;
+}
+
+.container {
+    text-align: center;
+    padding: 20px;
+}
+
+.voltar {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.formulario {
+    width: 90%;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.formulario input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.formulario button {
+    width: 100%;
+    padding: 10px;
+    background-color: black;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
