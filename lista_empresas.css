@@ -1,0 +1,77 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f8f8;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+}
+
+.container {
+    width: 90%;
+    max-width: 600px;
+    background: white;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.search-box {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.search-box button {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.company {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+}
+
+.company img {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+}
+
+.company-info {
+    flex-grow: 1;
+}
+
+.company h3 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.favorite {
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.cart {
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.buy-button {
+    width: 100%;
+    padding: 15px;
+    background: black;
+    color: white;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+}
