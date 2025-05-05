@@ -1,0 +1,48 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+body {
+    background-color: rgb(12, 12, 12);
+}
+h1,h2,p{
+    color: #ccc;
+}
+
+.container {
+    text-align: center;
+    padding: 20px;
+}
+
+.logo {
+    width: 500px;
+}
+
+form {
+    width: 90%;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: black;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+div{
+    color: #ccc;
+    text-align: auto;
+}
