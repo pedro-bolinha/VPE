@@ -62,11 +62,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
-
-            alert(`Compra realizada com sucesso! Total de empresas: ${cartCount}`);
-            cartCount = 0;
-        } else {
-            alert('Adicione ao menos uma empresa ao carrinho antes de comprar.');
-        }
-    });
-});
