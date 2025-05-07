@@ -5,17 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dados Financeiros</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Estilos mínimos para visualização */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+        }
+        .card-header h1 {
+            margin: 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+        }
+    </style>
 </head>
 <body>
 
-    <canvas class="line-chart"></canvas>
+<div class="container">
+    <canvas id="lineChart"></canvas>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js"></script>
-    <script>
-        // Seleciona corretamente o canvas (pega o primeiro com a classe)
-        var ctx = document.getElementsByClassName("line-chart")[0].getContext("2d");
+    <div class="card">
+        <div class="card-header">
+            <h1>Fampepar</h1>
+            <p class="stats">Total: R$ 149.868 (+49,89%)</p>
+        </div>
+    </div>
 
-        // Dados do gráfico
+    <div class="footer">
+        <p>© 2025 FAMPEPAR - Todos os direitos reservados</p>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.min.js"></script>
+<script>
+    // Espera o DOM carregar
+    document.addEventListener('DOMContentLoaded', () => {
+        const ctx = document.getElementById("lineChart").getContext("2d");
+
         const labels = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho"];
         const data = {
             labels: labels,
@@ -28,28 +68,14 @@
             }]
         };
 
-        // Configuração do gráfico
         const config = {
             type: 'line',
             data: data,
         };
 
-        // Criação do gráfico
-        const chartGraph = new Chart(ctx, config);
-    </script>
-
-    <div class="container">
-        <div class="card">
-            <div class="card-header">
-                <h1>Fampepar</h1>
-                <p class="stats">Total: $149.868 (+49.89%)</p>
-            </div>
-        </div>
-
-        <div class="footer">
-            <p>© 2025 FAMPEPAR - Todos os direitos reservados</p>
-        </div>
-    </div>
+        new Chart(ctx, config);
+    });
+</script>
 
 </body>
 </html>
