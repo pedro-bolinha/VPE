@@ -1,24 +1,27 @@
-const empresas = [
-    {
-        name: '',
-        descricao: '',
-        img: '',
-        preco: ''
-    },
-    {
-        name: '',
-        descricao: '',
-        img: '',
-        preco: ''
-        
-    },
-    {   
-        name: "",
-        descricao: '',
-        img: '',
-        preco: ''
-    }
-]
+import { empresas } from "./empresa.js";
+
+const divEmpresas = document.querySelector('.empresas');
+
+function createEmpresaCard(empresa) {
+    return `
+        <div class="company">
+            <img src="${empresa.img}" alt="UNI">
+            <div class="company-info">
+                <h3>${empresa.name}</h3>
+                <p>${empresa.descricao}</p>
+            </div>
+            <span class="favorite">🤍</span>
+            <span class="cart">🛒</span>
+            <span>${empresa.preco}</span>
+        </div>
+    `
+}
+
+for (const empresa of empresas) {
+    const card = createEmpresaCard(empresa);
+
+    divEmpresas.insertAdjacentHTML('beforeend', card);
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.querySelector('.search-box input');
