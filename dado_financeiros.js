@@ -1,17 +1,16 @@
 const dadosFinanceiros = [
-    { mes: 'Janeiro', valor: 25000 },
-    { mes: 'Fevereiro', valor: 30000 },
-    { mes: 'Março', valor: 18000 },
-    { mes: 'Abril', valor: 26000 },
-    { mes: 'Maio', valor: 30868 },
-    {mes : "Junho", valor: 42000},
-    {mes : "Julho", valor: 27920},
-    {mes : "Agosto", valor: 18100},
-    {mes : "Setembro", valor: 17000},
-    {mes : "Outubro", valor: 29000},
-    {mes : "Novembro", valor: 50000},
-    {mes : "Dezembro", valor: 10000}
-
+    { mes: 'Janeiro', valor: 11572 },
+    { mes: 'Fevereiro', valor: 13887 },
+    { mes: 'Março', valor: 8332 },
+    { mes: 'Abril', valor: 12029 },
+    { mes: 'Maio', valor: 14289 },
+    { mes: 'Junho', valor: 19442 },
+    { mes: 'Julho', valor: 12926 },
+    { mes: 'Agosto', valor: 8385 },
+    { mes: 'Setembro', valor: 7870 },
+    { mes: 'Outubro', valor: 13435 },
+    { mes: 'Novembro', valor: 23145 },
+    { mes: 'Dezembro', valor: 4626 }
 ];
 
 function criarTabelaFinanceira() {
