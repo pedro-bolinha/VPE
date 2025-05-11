@@ -6,9 +6,9 @@
 }
 
 body {
-    font-family: 'Roboto', sans-serif;
-    background-color: #f0f2f5;
-    color: #333;
+    font-family: 'Segoe UI', 'Roboto', sans-serif;
+    background-color: #f4f6f9;
+    color: #2c3e50;
     line-height: 1.6;
 }
 
@@ -17,57 +17,102 @@ body {
     width: 90%;
     max-width: 1200px;
     margin: 40px auto;
+    padding: 20px;
 }
 
 /* Cartões */
 .card {
-    background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, #ffffff, #f9f9f9);
+    border-radius: 16px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.07);
     overflow: hidden;
     margin-bottom: 30px;
-    transition: all 0.3s ease;
+    transition: all 0.3s ease-in-out;
 }
 
 .card:hover {
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
-    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+    transform: translateY(-6px);
 }
 
 .card-header {
-    background-color: black;
-    color: #fff;
-    padding: 20px;
+    background: #2c3e50;
+    color: #ecf0f1;
+    padding: 24px;
     text-align: center;
 }
 
 .card-header h1 {
-    font-size: 32px;
-    font-weight: bold;
+    font-size: 36px;
+    font-weight: 700;
 }
 
 .stats {
-    font-size: 18px;
-    color: #4CAF50;
+    font-size: 20px;
+    color: #27ae60;
     font-weight: 600;
-    margin-top: 10px;
+    margin-top: 12px;
 }
 
-.chart {
-    background-color: #f9f9f9;
-    height: 250px;
+/* Tabela */
+.tabela-financeira {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
     border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.tabela-financeira th,
+.tabela-financeira td {
+    padding: 14px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.tabela-financeira th {
+    background-color: #ecf0f1;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.tabela-financeira tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+.tabela-financeira tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Gráfico ou área visual */
+.chart {
+    background: #1e272e;
+    height: 250px;
+    border-radius: 12px;
     margin-top: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
+    color: white;
+    font-weight: 500;
 }
 
+/* Footer */
 .footer {
     text-align: center;
-    margin-top: 40px;
+    margin-top: 50px;
     font-size: 14px;
-    color: #999;
+    color: #7f8c8d;
+}
+
+/* Cabeçalho superior opcional */
+.top-header {
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 600;
+    color: #34495e;
 }
 
 /* Responsividade */
@@ -84,27 +129,9 @@ body {
     .stats {
         font-size: 16px;
     }
-}
 
-.tabela-financeira {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
+    .tabela-financeira th,
+    .tabela-financeira td {
+        padding: 10px;
+    }
 }
-
-.tabela-financeira th,
-.tabela-financeira td {
-    border: 1px solid #ccc;
-    padding: 8px;
-    text-align: left;
-}
-
-.tabela-financeira th {
-    background-color: #f2f2f2;
-}
-
-.top-header {
-    margin-bottom: 10px;
-    text-align: center;
-}
-
