@@ -1,41 +1,27 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dados Financeiros</title>
-    <link rel="stylesheet" href="dados_financeiros.css">
+    <title>Mais Informações</title>
+    <link rel="stylesheet" href="dados.css">
+</head>
+<body>
     <div class="container">
-        <!-- Tabela vai aqui -->
-        <div class="container">
-
-            <!-- Novo título no topo -->
-    <div class="header-content">
-        <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhy6F90kzzL7kj5EVStGkBLSQEgeZYPL-kGwZ2286X7hWasUdxZo20Dk2XObPe-Cf3eBd8jEv68wCbiz5aDhIAjw3dp64JLNTMMOFduvOR85AXiok8LgLbYlhkuK5Er2y2TCQm6ev799-m58OZeU775aXoYF5OrBB3_7aabQGs0Jv3d2eiMIKu6icMiN3gB/s300/images%20(2).png" alt="Logo" class="logo">
-        <h1>FAMPEPAR</h1>
+        <h1>Dados Financeiros</h1>
+        <div id="empresa-info"></div>
+        <button onclick="window.history.back();">Voltar</button>
     </div>
-</div>
-        
-            <!-- Tabela -->
-            <div id="tabela-container"></div>
-        
-            <!-- Gráfico -->
-            <canvas id="lineChart"></canvas>
-        
-            <!-- Card com total apenas -->
-            <div class="card">
-                <div class="card-header">
-                    <p class="stats">Total: R$ 149.868 (+49,89%)</p>
-                </div>
-            </div>
-        
-            <div class="footer">
-                <p>© 2025 FAMPEPAR - Todos os direitos reservados</p>
-            </div>
-        </div>        
 
-<!-- Seu JavaScript externo -->
-<script src="dados_financeiros.js"></script>
+    <script type="module" src="dados.js"></script>
+</body>
+</html>
+
+
+<!-- JavaScript  -->
+    <script type="module" src="dados.js"></script>
+    <script type="module" src="link.js"></script>
+
 
 </body>
 </html>
