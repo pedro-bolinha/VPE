@@ -1,19 +1,7 @@
-const dadosFinanceiros = [
-    { mes: 'Janeiro', valor: 11572 },
-    { mes: 'Fevereiro', valor: 13887 },
-    { mes: 'Março', valor: 8332 },
-    { mes: 'Abril', valor: 12029 },
-    { mes: 'Maio', valor: 14289 },
-    { mes: 'Junho', valor: 19442 },
-    { mes: 'Julho', valor: 12926 },
-    { mes: 'Agosto', valor: 8385 },
-    { mes: 'Setembro', valor: 7870 },
-    { mes: 'Outubro', valor: 13435 },
-    { mes: 'Novembro', valor: 23145 },
-    { mes: 'Dezembro', valor: 4626 }
-];
+import { empresas } from './empresas.js';
 
-function criarTabelaFinanceira() {
+// Função para criar a tabela financeira de uma empresa específica
+function criarTabelaFinanceira(empresaSelecionada) {
     const container = document.getElementById('tabela-container');
 
     const tabela = document.createElement('table');
@@ -29,7 +17,9 @@ function criarTabelaFinanceira() {
     tabela.appendChild(thead);
 
     const tbody = document.createElement('tbody');
-    dadosFinanceiros.forEach(item => {
+    
+    // Pega os dados financeiros da empresa específica
+    empresaSelecionada.dadosFinanceiros.forEach(item => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>${item.mes}</td>
@@ -37,9 +27,12 @@ function criarTabelaFinanceira() {
         `;
         tbody.appendChild(tr);
     });
+
     tabela.appendChild(tbody);
 
     container.appendChild(tabela);
 }
 
-criarTabelaFinanceira();
+// Exemplo de uso: Criar tabela para a "FAMPEPAR"
+const empresaSelecionada = empresas.find(empresa => empresa.name === "FAMPEPAR");
+criarTabelaFinanceira(empresaSelecionada);
