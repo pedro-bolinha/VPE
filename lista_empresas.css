@@ -1,77 +1,179 @@
+/* Estilos gerais */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f8f8f8;
+    font-family: 'Arial', sans-serif;
     margin: 0;
     padding: 0;
-    display: flex;
-    justify-content: center;
+    background-color: #0a0a0a;
 }
 
 .container {
-    width: 90%;
-    max-width: 600px;
-    background: white;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    width: 80%;
+    margin: 20px auto;
 }
 
+h1 {
+    text-align: center;
+    color: #333;
+    font-size: 32px;
+    margin-top: 20px;
+}
+
+/* Estilos da barra de pesquisa */
 .search-box {
     display: flex;
-    margin-bottom: 20px;
+    justify-content: center;
+    margin-bottom: 30px;
 }
 
 .search-box input {
-    width: 100%;
-    padding: 10px;
+    padding: 12px;
+    font-size: 16px;
+    width: 300px;
     border: 1px solid #ccc;
     border-radius: 5px;
-}
-
-.search-box button {
-    background: none;
-    border: none;
-    cursor: pointer;
-}
-
-.company {
-    display: flex;
-    align-items: center;
-    border-bottom: 1px solid #ddd;
-    padding: 10px 0;
-}
-
-.company img {
-    width: 50px;
-    height: 50px;
     margin-right: 10px;
 }
 
-.company-info {
-    flex-grow: 1;
-}
-
-.company h3 {
-    margin: 0;
+.search-box button {
+    padding: 12px;
     font-size: 16px;
-}
-
-.favorite {
-    cursor: pointer;
-    font-size: 20px;
-}
-
-.cart {
-    margin-left: 10px;
-    cursor: pointer;
-}
-
-.buy-button {
-    width: 100%;
-    padding: 15px;
-    background: black;
+    background-color: #007BFF;
     color: white;
     border: none;
-    font-size: 16px;
-    cursor: pointer;
     border-radius: 5px;
+    cursor: pointer;
 }
+
+.search-box button:hover {
+    background-color: #0056b3;
+}
+
+/* Estilos para a lista de empresas */
+.empresas {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.company {
+    background-color: white;
+    width: 280px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+    overflow: hidden;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.company:hover {
+    transform: scale(1.05);
+}
+
+.company img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-bottom: 1px solid #ddd;
+}
+
+.company-info {
+    padding: 15px;
+}
+
+.company-info h3 {
+    font-size: 18px;
+    color: #333;
+    margin: 10px 0;
+}
+
+.company-info p {
+    font-size: 14px;
+    color: #555;
+}
+
+.favorite,
+.cart {
+    font-size: 24px;
+    margin-top: 10px;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.favorite:hover,
+.cart:hover {
+    color: #007BFF;
+}
+
+.preco {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin-top: 10px;
+}
+
+.more-info {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 10px 20px;
+    text-decoration: none;
+    color: white;
+    background-color: #007BFF;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.more-info:hover {
+    background-color: #0056b3;
+}
+
+/* Estilos para o botão de comprar */
+.buy-button {
+    display: block;
+    width: 220px;
+    padding: 15px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    margin: 30px auto;
+    text-align: center;
+    cursor: pointer;
+}
+
+.buy-button:hover {
+    background-color: #218838;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .search-box {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .search-box input {
+        width: 80%;
+        margin-bottom: 10px;
+    }
+
+    .company {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .empresas {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .buy-button {
+        width: 100%;
+    }
+}
+
