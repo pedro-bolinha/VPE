@@ -1,4 +1,7 @@
-import { empresas } from './empresas.js';
+const response = await fetch('/empresas');
+const empresas = await response.json();
+
+// console.log(JSON.stringify(empresas, null, 2));
 
 // Função para criar a tabela financeira de uma empresa específica
 function criarTabelaFinanceira(empresaSelecionada) {
