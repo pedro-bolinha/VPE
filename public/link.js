@@ -1,4 +1,4 @@
-import { empresas } from './empresas.js';
+import { empresas } from './empresa.js';
 
 document.addEventListener('DOMContentLoaded', function() {
     // Pega o nome da empresa da URL
