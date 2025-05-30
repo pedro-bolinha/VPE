@@ -1,6 +1,6 @@
-import { empresas } from "./empresas.js";
+import { empresas } from "./empresa.js";
 
-var divEmpresas = document.querySelector('.empresas');
+var divEmpresas = document.querySelector('.empresa');
 
 function createEmpresaCard(empresa) {
   return (
@@ -13,7 +13,7 @@ function createEmpresaCard(empresa) {
       '<span class="favorite">🤍</span>' +
       '<span class="cart">🛒</span>' +
       '<span class="preco">R$ ' + empresa.preco + '</span>' +
-      '<a class="more-info" href="dados.html?empresa=' + encodeURIComponent(empresa.name) + '">Mais informações</a>' +
+      '<a class="more-info" href="dados_financeiros.html?empresa=' + encodeURIComponent(empresa.name) + '">Mais informações</a>' +
     '</div>'
   );
 }
