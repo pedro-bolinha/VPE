@@ -1,5 +1,5 @@
 {
-  "name": "VPE",
+  "name": "vpe",
   "type": "module",
   "scripts": {
     "start": "node src/index.js",
@@ -7,5 +7,19 @@
   },
   "dependencies": {
     "express": "^5.1.0"
-  }
+  },
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pedro-bolinha/VPE.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pedro-bolinha/VPE/issues"
+  },
+  "homepage": "https://github.com/pedro-bolinha/VPE#readme",
+  "description": ""
 }

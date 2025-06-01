@@ -1,76 +1,44 @@
-import { empresas } from "./empresa.js";
+document.addEventListener('DOMContentLoaded', async function () {
+  const response = await fetch('/empresas');
+  const empresas = await response.json();
+  const divEmpresas = document.querySelector('.empresas');
 
-var divEmpresas = document.querySelector('.empresa');
-
-function createEmpresaCard(empresa) {
-  return (
-    '<div class="company">' +
-      '<img src="' + empresa.img + '" alt="UNI">' +
-      '<div class="company-info">' +
-        '<h3>' + empresa.name + '</h3>' +
-        '<p>' + empresa.descricao + '</p>' +
-      '</div>' +
-      '<span class="favorite">🤍</span>' +
-      '<span class="cart">🛒</span>' +
-      '<span class="preco">R$ ' + empresa.preco + '</span>' +
-      '<a class="more-info" href="dados_financeiros.html?empresa=' + encodeURIComponent(empresa.name) + '">Mais informações</a>' +
-    '</div>'
-  );
-}
-
-for (var i = 0; i < empresas.length; i++) {
-  var card = createEmpresaCard(empresas[i]);
-  divEmpresas.insertAdjacentHTML('beforeend', card);
-}
-
-document.addEventListener('DOMContentLoaded', function () {
-  var searchInput = document.querySelector('.search-box input');
-  var companies = document.querySelectorAll('.company');
-  var favoriteIcons = document.querySelectorAll('.favorite');
-  var cartIcons = document.querySelectorAll('.cart');
-  var buyButton = document.querySelector('.buy-button');
-  var moreInfoButtons = document.querySelectorAll('.more-info');
-
-  // Filtro de busca
-  searchInput.addEventListener('input', function () {
-    var query = searchInput.value.toLowerCase();
-    for (var i = 0; i < companies.length; i++) {
-      var name = companies[i].querySelector('h3').textContent.toLowerCase();
-      companies[i].style.display = name.indexOf(query) !== -1 ? 'flex' : 'none';
-    }
+  empresas.forEach(empresa => {
+    const card = `
+      <div class="company">
+        <img src="${empresa.img}" alt="Imagem">
+        <div class="company-info">
+          <h3>${empresa.name}</h3>
+        </div>
+        <span class="favorite">🤍</span>
+        <span class="cart">🛒</span>
+        <span class="preco">R$ ${empresa.preco.toLocaleString('pt-BR')}</span>
+        <a class="more-info" href="dados_financeiros.html?empresa=${encodeURIComponent(empresa.name)}">Mais informações</a>
+      </div>`;
+    divEmpresas.insertAdjacentHTML('beforeend', card);
   });
 
-  // Favoritar
-  for (var i = 0; i < favoriteIcons.length; i++) {
-    favoriteIcons[i].addEventListener('click', function () {
-      this.textContent = this.textContent === '❤️' ? '🤍' : '❤️';
+  // adicionar eventos aos ícones após renderizar os cards
+  document.querySelectorAll('.favorite').forEach(icon => {
+    icon.addEventListener('click', () => {
+      icon.textContent = icon.textContent === '❤️' ? '🤍' : '❤️';
     });
-  }
+  });
 
-  // Adicionar ao carrinho
-  var cartCount = 0;
-  for (var i = 0; i < cartIcons.length; i++) {
-    cartIcons[i].addEventListener('click', function () {
+  let cartCount = 0;
+  document.querySelectorAll('.cart').forEach(icon => {
+    icon.addEventListener('click', () => {
       cartCount++;
-      alert('Empresa adicionada ao carrinho. Total no carrinho: ' + cartCount);
+      alert(`Empresa adicionada ao carrinho. Total: ${cartCount}`);
     });
-  }
+  });
 
-  // Comprar
-  buyButton.addEventListener('click', function () {
+  document.querySelector('.buy-button').addEventListener('click', () => {
     if (cartCount > 0) {
-      alert('Compra realizada com sucesso! Total de empresas: ' + cartCount);
+      alert(`Compra realizada! Total: ${cartCount}`);
       cartCount = 0;
     } else {
-      alert('Adicione ao menos uma empresa ao carrinho antes de comprar.');
+      alert('Adicione ao menos uma empresa ao carrinho.');
     }
   });
-
-  // Mais informações
-  for (var i = 0; i < moreInfoButtons.length; i++) {
-    moreInfoButtons[i].addEventListener('click', function () {
-      var nomeEmpresa = this.getAttribute('data-nome');
-      alert('Mais informações sobre a ' + nomeEmpresa + ' serão exibidas aqui.');
-    });
-  }
 });

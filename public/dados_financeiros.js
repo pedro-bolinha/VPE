@@ -1,41 +1,39 @@
-const response = await fetch('/empresas');
-const empresas = await response.json();
+document.addEventListener('DOMContentLoaded', async function () {
+  try {
+    const response = await fetch('/empresas');
+    const empresas = await response.json();
+    const params = new URLSearchParams(window.location.search);
+    const nomeEmpresa = params.get('empresa');
 
-// console.log(JSON.stringify(empresas, null, 2));
+    const empresa = empresas.find(e => e.name === nomeEmpresa);
+    const empresaInfoDiv = document.getElementById('empresa-info');
 
-// Função para criar a tabela financeira de uma empresa específica
-function criarTabelaFinanceira(empresaSelecionada) {
-    const container = document.getElementById('tabela-container');
+    if (empresa) {
+      empresaInfoDiv.innerHTML = `
+        <h2>${empresa.name}</h2>
+        <img src="${empresa.img}" style="max-width: 300px;" />
+        <p><strong>Descrição:</strong> ${empresa.descricao}</p>
+        <p><strong>Preço:</strong> R$ ${empresa.preco.toLocaleString('pt-BR')}</p>
+      `;
 
-    const tabela = document.createElement('table');
-    tabela.classList.add('tabela-financeira');
-
-    const thead = document.createElement('thead');
-    thead.innerHTML = `
-        <tr>
-            <th>Mês</th>
-            <th>Valor (R$)</th>
-        </tr>
-    `;
-    tabela.appendChild(thead);
-
-    const tbody = document.createElement('tbody');
-    
-    // Pega os dados financeiros da empresa específica
-    empresaSelecionada.dadosFinanceiros.forEach(item => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${item.mes}</td>
-            <td>R$ ${item.valor.toLocaleString('pt-BR')}</td>
+      if (empresa.dadosFinanceiros) {
+        const tabela = `
+          <h3>Dados Financeiros:</h3>
+          <table border="1">
+            <thead><tr><th>Mês</th><th>Valor</th></tr></thead>
+            <tbody>
+              ${empresa.dadosFinanceiros.map(df => `
+                <tr><td>${df.mes}</td><td>R$ ${df.valor.toLocaleString('pt-BR')}</td></tr>
+              `).join('')}
+            </tbody>
+          </table>
         `;
-        tbody.appendChild(tr);
-    });
-
-    tabela.appendChild(tbody);
-
-    container.appendChild(tabela);
-}
-
-// Exemplo de uso: Criar tabela para a "FAMPEPAR"
-const empresaSelecionada = empresas.find(empresa => empresa.name === "FAMPEPAR");
-criarTabelaFinanceira(empresaSelecionada);
+        document.getElementById('tabela-container').innerHTML = tabela;
+      }
+    } else {
+      empresaInfoDiv.innerHTML = `<p>Empresa não encontrada.</p>`;
+    }
+  } catch (err) {
+    console.error('Erro ao carregar dados:', err);
+  }
+});
