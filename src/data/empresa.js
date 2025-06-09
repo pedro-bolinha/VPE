@@ -7,13 +7,13 @@ export const empresas = [
   },
   {
     name: "Bolo do Dia",
-    descricao: "A Bolo do Dia é uma confeitaria especializada em bolos caseiros e tortas premium. Reconhecida pela qualidade dos ingredientes e receitas tradicionais, é um ponto de referência para festas e encomendas sob demanda.",
-    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Freceitatodahora.com.br%2Fa-melhor-versao-de-bolo-mole-que-existe-parece-pudim-de-tao-cremosao%2F&psig=AOvVaw3ZT05Ti8Kw0yGFwEwYVhF7&ust=1747576562683000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqfwoTCNCehJfUqo0DFQAAAAAdAAAAABAK",
+    descricao: "A Bolo do Dia é uma confeitaria artesanal especializada em bolos caseiros e tortas premium, reconhecida pela alta qualidade de seus ingredientes e receitas tradicionais. Com forte presença no mercado local, atende a eventos e encomendas sob demanda, oferecendo produtos personalizados e atendimento diferenciado. A empresa apresenta um modelo de negócio sólido, com boa fidelização de clientes e potencial para expansão. Busca um investidor ou sócio estratégico para ampliar a capacidade produtiva, fortalecer sua presença digital e expandir para novos mercados, garantindo crescimento sustentável e valorização da marca.",
+    img: "https://receitatodahora.com.br/wp-content/uploads/2024/04/bolo-mole-1024x684.jpg.webp",
     preco: 95000
   },
   {
     name: "Salgado Dahora",
-    descricao: "Com foco em salgados prontos para consumo, a Salgado Dahora é uma rede em crescimento no setor de fast-food regional. Atende escolas, empresas e eventos, com produção em escala de coxinhas, empadas e quibes congelados.",
+    descricao: "A Salgado Dahora é uma rede em expansão no segmento de fast-food regional, especializada na produção e comercialização de salgados prontos para consumo. Atende com eficiência instituições educacionais, empresas e eventos diversos, oferecendo uma linha de produtos congelados que inclui coxinhas, empadas e quibes. Com operação estruturada para produção em escala, a empresa destaca-se pela qualidade consistente, agilidade na entrega e atendimento personalizado, consolidando-se como referência no mercado regional.",
     img: "https://www.diariozonanorte.com.br/wp-content/uploads/2020/07/coxinha.jpg",
     preco: 110000
   },
@@ -26,9 +26,10 @@ export const empresas = [
   {
     name: "Refrescos Brasil",
     descricao: "Distribuidora especializada em bebidas, sucos naturais e refrigerantes regionais. A Refrescos Brasil é referência na entrega rápida para bares, restaurantes e supermercados de médio porte.",
-    img: "https://images.unsplash.com/photo-1598511727478-950dbcd31b26?auto=format&fit=crop&w=600&q=60",
+    img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQRNkIHqKkeGWHxEA_XsB26TDk8YFc0lK7aww&s",
     preco: 250000
   }
 ];
 export default empresas;
+
 
