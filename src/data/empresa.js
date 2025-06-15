@@ -32,4 +32,3 @@ export const empresas = [
 ];
 export default empresas;
 
-
