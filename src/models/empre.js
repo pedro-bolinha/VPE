@@ -1,49 +1,125 @@
-import { v4 as uuidv4 } from 'uuid';
-import { empresas } from '../data/empresa.js';
+import Database from '../data/databs.js';
 
-function create({ name, preco }) {
-  const id = uuidv4();
-  const empresa = { name, preco, id };
-
-  if (name && preco) {
-    empresas.push(empresa);
-    return empresa;
+async function create({ name, value }) {
+  const db = await Database.connect();
+ 
+  if (name && value) {
+    const sql = `
+      INSERT INTO
+        usuarios (name, value)
+      VALUES
+        (?, ?)
+    `;
+ 
+    const { lastID } = await db.run(sql, [name, value]);
+ 
+    return await readById(lastID);
   } else {
     throw new Error('Unable to create empresa');
   }
 }
-
-function read(field, value) {
+ 
+async function read(field, value) {
+  const db = await Database.connect();
+ 
   if (field && value) {
-    return empresas.filter((empresa) => empresa[field].includes(value));
+    const sql = `
+      SELECT
+          id, name, value
+        FROM
+          negocios
+        WHERE
+          ${field} = '?'
+      `;
+ 
+    const empresas = await db.all(sql, [value]);
+ 
+    return empresas;
   }
-  return empresas;
+ 
+  const sql = `
+    SELECT
+      id, name, value
+    FROM
+      propostas
+  `;
+ 
+  const investments = await db.all(sql);
+ 
+  return investments;
 }
-
-function readById(id) {
-  const index = empresas.findIndex((empresa) => empresa.id === id);
-  if (!empresas[index]) {
-    throw new Error('Empresa not found');
-  }
-  return empresas[index];
-}
-
-function update({ id, name, preco }) {
-  if (id && name && preco) {
-    const index = empresas.findIndex((empresa) => empresa.id === id);
-    if (index === -1) throw new Error('Empresa not found');
-    empresas[index] = { id, name, preco };
-    return empresas[index];
+ 
+async function readById(id) {
+  const db = await Database.connect();
+ 
+  if (id) {
+    const sql = `
+      SELECT
+          id, name, value
+        FROM
+          propostas
+        WHERE
+          id = ?
+      `;
+ 
+    const investment = await db.get(sql, [id]);
+ 
+    if (investment) {
+      return investment;
+    } else {
+      throw new Error('Investment not found');
+    }
   } else {
-    throw new Error('Unable to update empresa');
+    throw new Error('Unable to find investment');
   }
 }
-
-function remove(id) {
-  const index = empresas.findIndex((empresa) => empresa.id === id);
-  if (index === -1) throw new Error('Empresa not found');
-  empresas.splice(index, 1);
-  return true;
+ 
+async function update({ id, name, value }) {
+  const db = await Database.connect();
+ 
+  if (name && value && id) {
+    const sql = `
+      UPDATE
+        investments
+      SET
+        name = ?, value = ?
+      WHERE
+        id = ?
+    `;
+ 
+    const { changes } = await db.run(sql, [name, value, id]);
+ 
+    if (changes === 1) {
+      return readById(id);
+    } else {
+      throw new Error('Investment not found');
+    }
+  } else {
+    throw new Error('Unable to update investment');
+  }
 }
-
+ 
+async function remove(id) {
+  const db = await Database.connect();
+ 
+  if (id) {
+    const sql = `
+      DELETE FROM
+        investments
+      WHERE
+        id = ?
+    `;
+ 
+    const { changes } = await db.run(sql, [id]);
+ 
+    if (changes === 1) {
+      return true;
+    } else {
+      throw new Error('Investment not found');
+    }
+  } else {
+    throw new Error('Investment not found');
+  }
+}
+ 
 export default { create, read, readById, update, remove };

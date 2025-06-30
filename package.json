@@ -3,10 +3,16 @@
   "type": "module",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "node --watch src/index.js"
+    "dev": "node --watch src/index.js",
+    "db:reload": "npm run db:drop && npm run db:load",
+    "db:load": "node src/data/load.js",
+    "db:drop": "rm src/data/db.sqlite"
   },
   "dependencies": {
-    "express": "^5.1.0"
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "morgan": "^1.10.0",
+    "sqlite-async": "^1.2.2"
   },
   "version": "1.0.0",
   "main": "index.js",
