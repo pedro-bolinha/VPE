@@ -36,10 +36,12 @@ app.use('/api', router);
 // Rota para compatibilidade com o frontend atual
 app.get('/empresas', async (req, res) => {
   try {
-    const response = await fetch(`http://localhost:${PORT}/api/empresas`);
-    const data = await response.json();
-    res.json(data);
+    // Import dinâmico do modelo para evitar conflitos de inicialização
+    const { default: Empresa } = await import('./src/models/empre.js');
+    const empresas = await Empresa.read();
+    res.json(empresas);
   } catch (error) {
+    console.error('Erro ao buscar empresas:', error);
     res.status(500).json({ message: 'Erro ao buscar empresas' });
   }
 });
@@ -51,7 +53,7 @@ app.get('/', (req, res) => {
 
 // Middleware para rotas não encontradas
 app.use((req, res) => {
-  res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
+  res.status(404).json({ message: 'Rota não encontrada' });
 });
 
 // Middleware para tratamento de erros

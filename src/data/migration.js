@@ -56,25 +56,11 @@ async function up() {
     );
   `;
 
-  // Tabela de propostas (relacionamento M:N entre usuários e empresas)
-  const propostasSql = `
-    CREATE TABLE IF NOT EXISTS propostas (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      empresa_id INTEGER NOT NULL,
-      usuario_id INTEGER NOT NULL,
-      valor_oferecido NUMERIC NOT NULL,
-      status VARCHAR(50) DEFAULT 'pendente',
-      data_proposta DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (empresa_id) REFERENCES empresas(id) ON DELETE CASCADE,
-      FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
-    );
-  `;
 
   await db.run(empresasSql);
   await db.run(dadosFinanceirosSql);
   await db.run(usuariosSql);
   await db.run(favoritosSql);
-  await db.run(propostasSql);
 
   console.log('Tabelas criadas com sucesso!');
 }

@@ -155,10 +155,12 @@ h1 {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* TABELA COM FUNDO COMPLETAMENTE BRANCO */
 table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+    background-color: #ffffff !important; /* Fundo branco forçado */
 }
 
 table th,
@@ -166,14 +168,31 @@ table td {
     padding: 12px;
     text-align: left;
     border-bottom: 1px solid #ddd;
+    background-color: #ffffff !important; /* Fundo branco forçado para células */
+    color: #333 !important; /* Texto escuro para contraste */
 }
 
 table th {
-    background-color: #f8f9fa;
+    background-color: #ffffff !important; /* Cabeçalho também com fundo branco */
+    font-weight: bold;
+    border-bottom: 2px solid #ddd; /* Linha mais forte para distinguir cabeçalho */
+}
+
+table tr {
+    background-color: #ffffff !important; /* Linhas com fundo branco */
 }
 
 table tr:hover {
-    background-color: #f1f1f1;
+    background-color: #f8f9fa !important; /* Hover muito sutil em cinza claro */
+}
+
+/* Garantir que toda a área da tabela seja branca */
+#tabela-container {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 button {
@@ -189,4 +208,3 @@ button {
 button:hover {
     background-color: #0056b3;
 }
-

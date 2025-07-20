@@ -2,11 +2,12 @@
   "name": "vpe",
   "type": "module",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "node --watch src/index.js",
-    "db:reload": "npm run db:drop && npm run db:load",
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "db:init": "npm run db:drop && npm run db:load",
     "db:load": "node src/data/load.js",
-    "db:drop": "rm src/data/db.sqlite"
+    "db:drop": "rm -f src/data/db.sqlite",
+    "db:reset": "npm run db:drop && npm run db:load"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -16,7 +17,7 @@
     "sqlite-async": "^1.2.2"
   },
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/pedro-bolinha/VPE.git"

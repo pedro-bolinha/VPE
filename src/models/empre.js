@@ -21,16 +21,8 @@ async function read(field, value) {
  
   let sql = `
     SELECT 
-      e.id, e.name, e.descricao, e.img, e.preco, e.setor,
-      GROUP_CONCAT(
-        JSON_OBJECT(
-          'mes', df.mes, 
-          'valor', df.valor,
-          'ano', df.ano
-        )
-      ) as dados_financeiros_json
+      e.id, e.name, e.descricao, e.img, e.preco, e.setor
     FROM empresas e
-    LEFT JOIN dados_financeiros df ON e.id = df.empresa_id
   `;
  
   let params = [];
@@ -40,17 +32,37 @@ async function read(field, value) {
     params.push(value);
   }
   
-  sql += ` GROUP BY e.id ORDER BY e.name`;
+  sql += ` ORDER BY e.name`;
  
   const empresas = await db.all(sql, params);
   
-  // Processar dados financeiros
-  return empresas.map(empresa => ({
-    ...empresa,
-    dadosFinanceiros: empresa.dados_financeiros_json 
-      ? JSON.parse(`[${empresa.dados_financeiros_json}]`)
-      : []
-  }));
+  // Buscar dados financeiros para cada empresa
+  for (let empresa of empresas) {
+    const dadosFinanceirosSql = `
+      SELECT mes, valor, ano
+      FROM dados_financeiros
+      WHERE empresa_id = ?
+      ORDER BY 
+      CASE mes
+        WHEN 'Janeiro' THEN 1
+        WHEN 'Fevereiro' THEN 2
+        WHEN 'Março' THEN 3
+        WHEN 'Abril' THEN 4
+        WHEN 'Maio' THEN 5
+        WHEN 'Junho' THEN 6
+        WHEN 'Julho' THEN 7
+        WHEN 'Agosto' THEN 8
+        WHEN 'Setembro' THEN 9
+        WHEN 'Outubro' THEN 10
+        WHEN 'Novembro' THEN 11
+        WHEN 'Dezembro' THEN 12
+      END
+    `;
+    
+    empresa.dadosFinanceiros = await db.all(dadosFinanceirosSql, [empresa.id]);
+  }
+  
+  return empresas;
 }
 
 async function readById(id) {
@@ -58,30 +70,38 @@ async function readById(id) {
  
   if (id) {
     const sql = `
-      SELECT 
-        e.id, e.name, e.descricao, e.img, e.preco, e.setor,
-        GROUP_CONCAT(
-          JSON_OBJECT(
-            'mes', df.mes, 
-            'valor', df.valor,
-            'ano', df.ano
-          )
-        ) as dados_financeiros_json
-      FROM empresas e
-      LEFT JOIN dados_financeiros df ON e.id = df.empresa_id
-      WHERE e.id = ?
-      GROUP BY e.id
+      SELECT id, name, descricao, img, preco, setor
+      FROM empresas
+      WHERE id = ?
     `;
  
     const empresa = await db.get(sql, [id]);
  
     if (empresa) {
-      return {
-        ...empresa,
-        dadosFinanceiros: empresa.dados_financeiros_json 
-          ? JSON.parse(`[${empresa.dados_financeiros_json}]`)
-          : []
-      };
+      // Buscar dados financeiros
+      const dadosFinanceirosSql = `
+        SELECT mes, valor, ano
+        FROM dados_financeiros
+        WHERE empresa_id = ?
+        ORDER BY 
+        CASE mes
+          WHEN 'Janeiro' THEN 1
+          WHEN 'Fevereiro' THEN 2
+          WHEN 'Março' THEN 3
+          WHEN 'Abril' THEN 4
+          WHEN 'Maio' THEN 5
+          WHEN 'Junho' THEN 6
+          WHEN 'Julho' THEN 7
+          WHEN 'Agosto' THEN 8
+          WHEN 'Setembro' THEN 9
+          WHEN 'Outubro' THEN 10
+          WHEN 'Novembro' THEN 11
+          WHEN 'Dezembro' THEN 12
+        END
+      `;
+      
+      empresa.dadosFinanceiros = await db.all(dadosFinanceirosSql, [id]);
+      return empresa;
     } else {
       throw new Error('Empresa não encontrada');
     }

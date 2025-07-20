@@ -3,7 +3,15 @@ import Database from './databs.js';
 async function up() {
   const db = await Database.connect();
 
-  // Inserir empresas
+  // Verificar se já existem dados para evitar duplicação
+  const existingEmpresas = await db.get('SELECT COUNT(*) as count FROM empresas');
+  
+  if (existingEmpresas.count > 0) {
+    console.log('Dados já existem no banco. Pulando inserção para evitar duplicação.');
+    return;
+  }
+
+  // Inserir empresas apenas se não existirem
   const empresas = [
     {
       name: "FAMPEPAR",
@@ -47,6 +55,8 @@ async function up() {
     VALUES (?, ?, ?, ?, ?)
   `;
 
+  console.log('Inserindo dados das empresas...');
+
   for (const empresa of empresas) {
     const result = await db.run(empresaSql, [
       empresa.name,
@@ -56,15 +66,51 @@ async function up() {
       empresa.setor
     ]);
     
-    // Inserir dados financeiros para cada empresa
-    const dadosFinanceiros = [
-      { mes: "Janeiro", valor: Math.floor(Math.random() * 50000) + 10000 },
-      { mes: "Fevereiro", valor: Math.floor(Math.random() * 50000) + 10000 },
-      { mes: "Março", valor: Math.floor(Math.random() * 50000) + 10000 },
-      { mes: "Abril", valor: Math.floor(Math.random() * 50000) + 10000 },
-      { mes: "Maio", valor: Math.floor(Math.random() * 50000) + 10000 },
-      { mes: "Junho", valor: Math.floor(Math.random() * 50000) + 10000 }
-    ];
+    // Inserir dados financeiros específicos para cada empresa
+    const dadosFinanceirosMap = {
+      "FAMPEPAR": [
+        { mes: "Janeiro", valor: 45721 },
+        { mes: "Fevereiro", valor: 39812 },
+        { mes: "Março", valor: 43902 },
+        { mes: "Abril", valor: 38541 },
+        { mes: "Maio", valor: 42156 },
+        { mes: "Junho", valor: 46789 }
+      ],
+      "Bolo do Dia": [
+        { mes: "Janeiro", valor: 32450 },
+        { mes: "Fevereiro", valor: 28900 },
+        { mes: "Março", valor: 35600 },
+        { mes: "Abril", valor: 31200 },
+        { mes: "Maio", valor: 38700 },
+        { mes: "Junho", valor: 41500 }
+      ],
+      "Salgado Dahora": [
+        { mes: "Janeiro", valor: 28500 },
+        { mes: "Fevereiro", valor: 31200 },
+        { mes: "Março", valor: 29800 },
+        { mes: "Abril", valor: 33400 },
+        { mes: "Maio", valor: 35100 },
+        { mes: "Junho", valor: 37600 }
+      ],
+      "Basket Pro": [
+        { mes: "Janeiro", valor: 56914 },
+        { mes: "Fevereiro", valor: 22116 },
+        { mes: "Março", valor: 15518 },
+        { mes: "Abril", valor: 45721 },
+        { mes: "Maio", valor: 39812 },
+        { mes: "Junho", valor: 43902 }
+      ],
+      "Refrescos Brasil": [
+        { mes: "Janeiro", valor: 67800 },
+        { mes: "Fevereiro", valor: 72400 },
+        { mes: "Março", valor: 69100 },
+        { mes: "Abril", valor: 74500 },
+        { mes: "Maio", valor: 71200 },
+        { mes: "Junho", valor: 76800 }
+      ]
+    };
+
+    const dadosFinanceiros = dadosFinanceirosMap[empresa.name] || [];
 
     const dadosFinanceirosSql = `
       INSERT INTO dados_financeiros (empresa_id, mes, valor, ano)
@@ -81,34 +127,38 @@ async function up() {
     }
   }
 
-  // Inserir usuários de exemplo
-  const usuarios = [
-    {
-      name: "Admin",
-      email: "admin@vpe.com",
-      senha_hash: "$2b$10$example", // Em produção, use hash real
-      tipo_usuario: "admin"
-    },
-    {
-      name: "Investidor Teste",
-      email: "investidor@test.com",
-      senha_hash: "$2b$10$example",
-      tipo_usuario: "investidor"
+  // Inserir usuários de exemplo apenas se não existirem
+  const existingUsuarios = await db.get('SELECT COUNT(*) as count FROM usuarios');
+  
+  if (existingUsuarios.count === 0) {
+    const usuarios = [
+      {
+        name: "Admin",
+        email: "admin@vpe.com",
+        senha_hash: "$2b$10$example", // Em produção, use hash real
+        tipo_usuario: "admin"
+      },
+      {
+        name: "Investidor Teste",
+        email: "investidor@test.com",
+        senha_hash: "$2b$10$example",
+        tipo_usuario: "investidor"
+      }
+    ];
+
+    const usuarioSql = `
+      INSERT INTO usuarios (name, email, senha_hash, tipo_usuario)
+      VALUES (?, ?, ?, ?)
+    `;
+
+    for (const usuario of usuarios) {
+      await db.run(usuarioSql, [
+        usuario.name,
+        usuario.email,
+        usuario.senha_hash,
+        usuario.tipo_usuario
+      ]);
     }
-  ];
-
-  const usuarioSql = `
-    INSERT INTO usuarios (name, email, senha_hash, tipo_usuario)
-    VALUES (?, ?, ?, ?)
-  `;
-
-  for (const usuario of usuarios) {
-    await db.run(usuarioSql, [
-      usuario.name,
-      usuario.email,
-      usuario.senha_hash,
-      usuario.tipo_usuario
-    ]);
   }
 
   console.log('Dados inseridos com sucesso!');
