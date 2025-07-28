@@ -4,6 +4,7 @@ body {
     margin: 0;
     padding: 0;
 }
+
 title, h2, p {
     color: #ccc;
 }
@@ -11,6 +12,12 @@ title, h2, p {
 .container {
     text-align: center;
     padding: 20px;
+    max-width: 500px;
+    margin: 0 auto;
+    background-color: rgba(30, 30, 30, 0.9);
+    border-radius: 15px;
+    margin-top: 50px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .voltar {
@@ -18,6 +25,43 @@ title, h2, p {
     border: none;
     cursor: pointer;
     font-size: 20px;
+    color: #ccc;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    padding: 10px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.voltar:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.logo {
+    margin-bottom: 20px;
+}
+
+.logo img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+h1 {
+    color: #fff;
+    font-size: 28px;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.subtitle {
+    color: #ccc;
+    margin-bottom: 30px;
+    font-size: 16px;
 }
 
 .formulario {
@@ -26,20 +70,269 @@ title, h2, p {
     margin: 0 auto;
 }
 
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #ccc;
+    font-weight: 500;
+    font-size: 14px;
+}
+
 .formulario input {
     width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    padding: 12px;
+    margin: 5px 0;
+    border: 1px solid #555;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.formulario input::placeholder {
+    color: #999;
+}
+
+.formulario input:focus {
+    outline: none;
+    border-color: #007BFF;
+    background-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
 }
 
 .formulario button {
     width: 100%;
-    padding: 10px;
-    background-color: black;
+    padding: 12px;
+    background-color: #007BFF;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.formulario button:hover:not(.loading) {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.formulario button:active:not(.loading) {
+    transform: translateY(0);
+}
+
+.login-link {
+    margin-top: 25px;
+    color: #ccc;
+}
+
+.login-link a {
+    color: #007BFF;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.login-link a:hover {
+    text-decoration: underline;
+}
+
+/* Validação */
+.formulario input.input-error {
+    border-color: #e74c3c !important;
+    background-color: rgba(231, 76, 60, 0.1) !important;
+    box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.2);
+}
+
+.formulario input.input-success {
+    border-color: #27ae60 !important;
+    background-color: rgba(39, 174, 96, 0.1) !important;
+    box-shadow: 0 0 0 2px rgba(39, 174, 96, 0.2);
+}
+
+.error-message {
+    color: #e74c3c;
+    font-size: 12px;
+    margin-top: 5px;
+    animation: slideIn 0.3s ease;
+    display: block;
+}
+
+.formulario button.loading {
+    opacity: 0.7;
+    cursor: not-allowed;
+    background-color: #6c757d;
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s linear infinite;
+    margin-right: 8px;
+}
+
+/* Mensagem de sucesso */
+.success-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+.success-box {
+    background: rgba(30, 30, 30, 0.95);
+    border: 1px solid #555;
+    padding: 40px;
+    border-radius: 15px;
+    text-align: center;
+    max-width: 400px;
+    margin: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.3s ease;
+}
+
+.success-icon {
+    color: #27ae60;
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.success-title {
+    color: #fff;
+    margin-bottom: 15px;
+    font-size: 24px;
+}
+
+.success-text {
+    color: #ccc;
+    margin-bottom: 25px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 4px;
+    background: #555;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    width: 0%;
+    height: 100%;
+    background: #27ae60;
+    animation: progress 3s linear forwards;
+}
+
+.error-alert {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #e74c3c;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+    z-index: 1000;
+    animation: slideInRight 0.3s ease;
+    max-width: 300px;
+}
+
+/* Animações */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes progress {
+    from {
+        width: 0%;
+    }
+    to {
+        width: 100%;
+    }
+}
+
+/* Responsividade */
+@media (max-width: 600px) {
+    .container {
+        margin: 20px;
+        padding: 20px;
+    }
+
+    .formulario {
+        width: 95%;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    .voltar {
+        top: 10px;
+        left: 10px;
+    }
 }
