@@ -1,5 +1,5 @@
 import express from 'express';
-import Empresa from './models/empre.js';
+import Empresa from './models/empresa.js';
 
 class HTTPError extends Error {
   constructor(message, code) {
@@ -11,7 +11,7 @@ class HTTPError extends Error {
 const router = express.Router();
 
 // Rota para criar empresa
-router.post('/empresas', async (req, res) => {
+router.post('/empresa', async (req, res) => {
   try {
     const created = await Empresa.create(req.body);
     res.status(201).json(created);
@@ -21,7 +21,7 @@ router.post('/empresas', async (req, res) => {
 });
 
 // Rota para listar empresas (com busca opcional)
-router.get('/empresas', async (req, res) => {
+router.get('/empresa', async (req, res) => {
   try {
     const { name, setor } = req.query;
     let results;
@@ -41,48 +41,60 @@ router.get('/empresas', async (req, res) => {
 });
 
 // Rota para buscar empresa por ID
-router.get('/empresas/:id', async (req, res) => {
+router.get('/empresa/:id', async (req, res) => {
   try {
     const item = await Empresa.readById(req.params.id);
     res.json(item);
   } catch (error) {
-    throw new HTTPError(error.message || 'Empresa não encontrada', 404);
+    if (error.message === 'Empresa não encontrada') {
+      throw new HTTPError(error.message, 404);
+    }
+    throw new HTTPError(error.message || 'Erro ao buscar empresa', 400);
   }
 });
 
 // Rota para atualizar empresa
-router.put('/empresas/:id', async (req, res) => {
+router.put('/empresa/:id', async (req, res) => {
   try {
     const updated = await Empresa.update({ ...req.body, id: req.params.id });
     res.json(updated);
   } catch (error) {
+    if (error.message === 'Empresa não encontrada') {
+      throw new HTTPError(error.message, 404);
+    }
     throw new HTTPError(error.message || 'Erro ao atualizar empresa', 400);
   }
 });
 
 // Rota para deletar empresa
-router.delete('/empresas/:id', async (req, res) => {
+router.delete('/empresa/:id', async (req, res) => {
   try {
     await Empresa.remove(req.params.id);
     res.sendStatus(204);
   } catch (error) {
+    if (error.message === 'Empresa não encontrada') {
+      throw new HTTPError(error.message, 404);
+    }
     throw new HTTPError(error.message || 'Erro ao remover empresa', 400);
   }
 });
 
 // Rota para adicionar dados financeiros
-router.post('/empresas/:id/dados-financeiros', async (req, res) => {
+router.post('/empresa/:id/dados-financeiros', async (req, res) => {
   try {
     const { dadosFinanceiros } = req.body;
     const updated = await Empresa.addDadosFinanceiros(req.params.id, dadosFinanceiros);
     res.json(updated);
   } catch (error) {
+    if (error.message === 'Empresa não encontrada') {
+      throw new HTTPError(error.message, 404);
+    }
     throw new HTTPError(error.message || 'Erro ao adicionar dados financeiros', 400);
   }
 });
 
 // Rota para buscar dados financeiros de uma empresa
-router.get('/empresas/:id/dados-financeiros', async (req, res) => {
+router.get('/empresa/:id/dados-financeiros', async (req, res) => {
   try {
     const dados = await Empresa.getDadosFinanceiros(req.params.id);
     res.json(dados);

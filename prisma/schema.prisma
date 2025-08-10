@@ -1,0 +1,34 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Empresa {
+  id                Int                 @id @default(autoincrement())
+  name              String
+  descricao         String?
+  img               String?
+  preco             Float
+  setor             String?
+  createdAt         DateTime            @default(now()) @map("created_at")
+  
+  dadosFinanceiros  DadoFinanceiro[]
+
+  @@map("empresas")
+}
+
+model DadoFinanceiro {
+  id        Int     @id @default(autoincrement())
+  empresaId Int     @map("empresa_id")
+  mes       String
+  valor     Float
+  ano       Int     @default(2024)
+  
+  empresa   Empresa @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+
+  @@map("dados_financeiros")
+}
