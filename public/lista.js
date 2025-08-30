@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     const empresas = await response.json();
     const divEmpresas = document.querySelector('.empresas');
 
-    // Limpa o container antes de adicionar os cards
     divEmpresas.innerHTML = '';
 
     empresas.forEach(empresa => {
@@ -22,7 +21,7 @@ document.addEventListener('DOMContentLoaded', async function () {
       divEmpresas.insertAdjacentHTML('beforeend', card);
     });
 
-    // Adicionar eventos aos ícones de favorito após renderizar os cards
+    
     document.querySelectorAll('.favorite').forEach(icon => {
       icon.addEventListener('click', () => {
         icon.textContent = icon.textContent === '❤️' ? '🤍' : '❤️';

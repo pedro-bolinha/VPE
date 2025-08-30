@@ -17,6 +17,7 @@ model Empresa {
   createdAt         DateTime            @default(now()) @map("created_at")
   
   dadosFinanceiros  DadoFinanceiro[]
+  favoritos         Favorito[]
 
   @@map("empresas")
 }
@@ -31,4 +32,34 @@ model DadoFinanceiro {
   empresa   Empresa @relation(fields: [empresaId], references: [id], onDelete: Cascade)
 
   @@map("dados_financeiros")
+}
+
+model Usuario {
+  id                Int       @id @default(autoincrement())
+  name              String
+  email             String    @unique
+  senhaHash         String    @map("senha_hash")
+  cpfCnpj           String?   @map("cpf_cnpj")
+  tipoUsuario       String    @default("investidor") @map("tipo_usuario")
+  telefone1         String?
+  telefone2         String?
+  dataNascimento    DateTime? @map("data_nascimento")
+  createdAt         DateTime  @default(now()) @map("created_at")
+
+  favoritos         Favorito[]
+
+  @@map("usuarios")
+}
+
+model Favorito {
+  id              Int      @id @default(autoincrement())
+  usuarioId       Int      @map("usuario_id")
+  empresaId       Int      @map("empresa_id")
+  dataFavoritado  DateTime @default(now()) @map("data_favoritado")
+
+  usuario         Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  empresa         Empresa  @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+
+  @@unique([usuarioId, empresaId])
+  @@map("favoritos")
 }

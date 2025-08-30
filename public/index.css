@@ -81,9 +81,37 @@ input[type="password"] {
     font-size: 16px;
 }
 
-input::placeholder {
-    color: #888;
+input[type="email"],
+input[type="password"],
+input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 5px;
+    background-color: #2c2c2c;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 400;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
 }
+
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="text"]:focus {
+    outline: none;
+    background-color: #333;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+input[type="email"]:hover,
+input[type="password"]:hover,
+input[type="text"]:hover {
+    background-color: #333;
+}
+
 
 button[type="submit"] {
     width: 100%;

@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import Empresa from './src/models/empresa.js';
+import Usuario from './src/models/usuario.js';
 import prisma from './src/lib/prisma.js';
 
 const app = express();
@@ -30,7 +31,104 @@ app.use(express.urlencoded({ extended: true }));
 // Servir arquivos estáticos
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ROTAS PRINCIPAIS COM PRISMA
+// ====== ROTAS DE USUÁRIOS ======
+
+// Criar usuário (registro)
+app.post('/api/usuarios', async (req, res) => {
+  try {
+    console.log(' Criando novo usuário:', req.body.email);
+    const usuario = await Usuario.create(req.body);
+    console.log(' Usuário criado com sucesso:', usuario.email);
+    res.status(201).json(usuario);
+  } catch (error) {
+    console.error(' Erro ao criar usuário:', error.message);
+    res.status(400).json({ message: error.message });
+  }
+});
+
+// Login de usuário
+app.post('/api/login', async (req, res) => {
+  try {
+    console.log(' Tentativa de login:', req.body.email);
+    const { email, senha } = req.body;
+    const usuario = await Usuario.authenticate(email, senha);
+    console.log(' Login realizado com sucesso:', usuario.email);
+    res.json({ 
+      success: true, 
+      usuario,
+      message: 'Login realizado com sucesso' 
+    });
+  } catch (error) {
+    console.error(' Erro no login:', error.message);
+    res.status(401).json({ 
+      success: false, 
+      message: error.message 
+    });
+  }
+});
+
+// Buscar usuário por ID
+app.get('/api/usuarios/:id', async (req, res) => {
+  try {
+    console.log(` Buscando usuário ID: ${req.params.id}`);
+    const usuario = await Usuario.readById(req.params.id);
+    res.json(usuario);
+  } catch (error) {
+    console.error(' Erro ao buscar usuário por ID:', error.message);
+    if (error.message === 'Usuário não encontrado') {
+      res.status(404).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: 'Erro interno do servidor', error: error.message });
+    }
+  }
+});
+
+// Listar usuários (apenas para admin)
+app.get('/api/usuarios', async (req, res) => {
+  try {
+    console.log(' Listando usuários...');
+    const usuarios = await Usuario.read();
+    console.log(` Encontrados ${usuarios.length} usuários`);
+    res.json(usuarios);
+  } catch (error) {
+    console.error(' Erro ao listar usuários:', error.message);
+    res.status(500).json({ message: 'Erro ao buscar usuários', error: error.message });
+  }
+});
+
+// Atualizar usuário
+app.put('/api/usuarios/:id', async (req, res) => {
+  try {
+    console.log(` Atualizando usuário ID: ${req.params.id}`);
+    const usuario = await Usuario.update({ ...req.body, id: req.params.id });
+    res.json(usuario);
+  } catch (error) {
+    console.error(' Erro ao atualizar usuário:', error.message);
+    if (error.message === 'Usuário não encontrado') {
+      res.status(404).json({ message: error.message });
+    } else {
+      res.status(400).json({ message: error.message });
+    }
+  }
+});
+
+// Deletar usuário
+app.delete('/api/usuarios/:id', async (req, res) => {
+  try {
+    console.log(` Removendo usuário ID: ${req.params.id}`);
+    await Usuario.remove(req.params.id);
+    res.sendStatus(204);
+  } catch (error) {
+    console.error(' Erro ao remover usuário:', error.message);
+    if (error.message === 'Usuário não encontrado') {
+      res.status(404).json({ message: error.message });
+    } else {
+      res.status(500).json({ message: error.message });
+    }
+  }
+});
+
+// ====== ROTAS DE EMPRESAS ======
 
 // Rota para listar empresas (compatibilidade com frontend atual)
 app.get('/empresas', async (req, res) => {
@@ -162,17 +260,19 @@ app.get('/api/empresas/:id/dados-financeiros', async (req, res) => {
   }
 });
 
-// Rota de status do Prisma
+// Rota de status do sistema
 app.get('/api/status', async (req, res) => {
   try {
     const empresasCount = await prisma.empresa.count();
     const dadosCount = await prisma.dadoFinanceiro.count();
+    const usuariosCount = await prisma.usuario.count();
     
     res.json({
       status: 'OK',
       database: 'Prisma SQLite',
       empresas: empresasCount,
       dadosFinanceiros: dadosCount,
+      usuarios: usuariosCount,
       timestamp: new Date().toISOString()
     });
   } catch (error) {
@@ -213,5 +313,4 @@ process.on('SIGINT', async () => {
 
 app.listen(PORT, () => {
   console.log(` Servidor rodando em http://localhost:${PORT}`);
-
 });
