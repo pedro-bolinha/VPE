@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         try {
             showLoading();
 
-            // Buscar todas as empresas (poderia ser otimizado para buscar apenas uma)
+            // Buscar todas as empresas
             const response = await fetch('/api/empresas');
             
             if (!response.ok) {
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         `;
     }
 
-    // Renderizar dados financeiros
+    // Renderizar dados financeiros (versão simplificada)
     async function renderDadosFinanceiros() {
         if (!empresaAtual) return;
 
@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
             if (dadosFinanceiros && dadosFinanceiros.length > 0) {
                 const tabelaHTML = `
-                    <h3> Dados Financeiros Detalhados</h3>
+                    <h3> Dados Financeiros</h3>
                     <div style="overflow-x: auto;">
                         <table>
                             <thead>
@@ -125,28 +125,19 @@ document.addEventListener('DOMContentLoaded', async function () {
                                     <th> Mês</th>
                                     <th> Valor (R$)</th>
                                     <th> Ano</th>
-                                    <th> Crescimento</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                ${dadosFinanceiros.map((df, index) => {
-                                    const valorAnterior = index > 0 ? dadosFinanceiros[index - 1].valor : df.valor;
-                                    const crescimento = index > 0 ? ((df.valor - valorAnterior) / valorAnterior * 100) : 0;
-                             
-                                    return `
-                                        <tr>
-                                            <td>${df.mes}</td>
-                                            <td>R$ ${df.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
-                                            <td>${df.ano}</td>
-                                            <td class="${crescimentoClass}">
-                                                ${crescimentoIcon} ${index > 0 ? crescimento.toFixed(1) + '%' : 'Base'}
-                                            </td>
-                                        </tr>
-                                    `;
-                                }).join('')}
+                                ${dadosFinanceiros.map(df => `
+                                    <tr>
+                                        <td>${df.mes}</td>
+                                        <td>R$ ${df.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+                                        <td>${df.ano}</td>
+                                    </tr>
+                                `).join('')}
                             </tbody>
                         </table>
-                   
+                    </div>
                 `;
                 tabelaContainer.innerHTML = tabelaHTML;
             } else {
@@ -165,24 +156,25 @@ document.addEventListener('DOMContentLoaded', async function () {
             // Usar dados financeiros básicos da empresa se houver erro na API específica
             if (empresaAtual.dadosFinanceiros && empresaAtual.dadosFinanceiros.length > 0) {
                 const tabelaHTML = `
-                    <h3> Dados Financeiros</h3>
-                  
-                    <table>
-                        <thead>
-                            <tr>
-                                <th> Mês</th>
-                                <th> Valor (R$)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${empresaAtual.dadosFinanceiros.map(df => `
+                    <h3>📊 Dados Financeiros</h3>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
                                 <tr>
-                                    <td>${df.mes}</td>
-                                    <td>R$ ${df.valor.toLocaleString('pt-BR')}</td>
+                                    <th> Mês</th>
+                                    <th> Valor (R$)</th>
                                 </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                ${empresaAtual.dadosFinanceiros.map(df => `
+                                    <tr>
+                                        <td>${df.mes}</td>
+                                        <td>R$ ${df.valor.toLocaleString('pt-BR')}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
                 `;
                 tabelaContainer.innerHTML = tabelaHTML;
             } else {
@@ -224,80 +216,6 @@ document.addEventListener('DOMContentLoaded', async function () {
             await auth.logout();
         }
     });
-
-    // Adicionar estilos CSS dinâmicos para o resumo
-    const style = document.createElement('style');
-    style.textContent = `
-        .financial-summary {
-            margin-top: 30px;
-            padding: 20px;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border-radius: 10px;
-            border-left: 4px solid #007BFF;
-        }
-        
-        .financial-summary h4 {
-            color: #2c3e50;
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-        
-        .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-        
-        .summary-item {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        
-        .summary-item strong {
-            color: #495057;
-            font-size: 14px;
-        }
-        
-        .summary-item span {
-            color: #007BFF;
-            font-size: 18px;
-            font-weight: 600;
-        }
-        
-        .positive { color: #27ae60 !important; }
-        .negative { color: #e74c3c !important; }
-        .neutral { color: #6c757d !important; }
-        
-        .no-data {
-            text-align: center;
-            padding: 40px 20px;
-            color: #6c757d;
-            background: #f8f9fa;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
-        
-        .error-message {
-            text-align: center;
-            padding: 20px;
-            color: #e74c3c;
-            background: rgba(231, 76, 60, 0.1);
-            border-radius: 8px;
-            margin-top: 20px;
-        }
-        
-        @media (max-width: 768px) {
-            .summary-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    `;
-    document.head.appendChild(style);
 
     // Verificar token periodicamente
     setInterval(async () => {

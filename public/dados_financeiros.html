@@ -18,9 +18,7 @@
                 <div class="user-info">
                     <span class="user-welcome">Logado como: <strong id="userName">Carregando...</strong></span>
                 </div>
-                <div class="user-actions">
-                    <button onclick="window.location.href='lista_empresas.html'" class="action-btn back-btn">
-                        ← Voltar às Empresas
+                <div class="user-actions">    
                     </button>
                     <button id="logoutBtn" class="action-btn logout-btn" title="Sair do Sistema">
                          Sair
@@ -41,7 +39,7 @@
         <div id="errorState" class="error-state" style="display: none;">
             <h2> Erro ao Carregar Dados</h2>
             <p id="errorMessage">Erro desconhecido</p>
-            <button onclick="location.reload()" class="retry-btn">Tentar Novamente</button>
+            <button onclick="location.reload()" class="retry-btn"> Tentar Novamente</button>
         </div>
 
         <!-- Conteúdo principal -->
@@ -49,14 +47,11 @@
             <div id="empresa-info"></div>
             <div id="tabela-container"></div>
             
-            <!-- Botões de ação -->
+            <!-- Botão de voltar centralizado -->
             <div class="action-buttons">
-                <button onclick="window.history.back();" class="btn-secondary">
-                    ← Voltar
-                </button>
-                <button onclick="window.location.href='lista_empresas.html'" class="btn-primary">
-                     Ver Todas as Empresas
-                </button>
+                <a href="lista_empresas.html" class="btn-secondary">
+                    ← Voltar para Lista de Empresas
+                </a>
             </div>
         </div>
     </div>
