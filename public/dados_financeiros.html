@@ -3,18 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mais Informações</title>
+    <title>Dados Financeiros - VPE</title>
     <link rel="stylesheet" href="dados_financeiros.css">
 </head>
 <body>
+    <!-- Header com informações do usuário -->
+    <header class="user-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <img src="https://www.probocontabilidade.com.br/wp2019/wp-content/uploads/2019/07/cifrao-em-preto-redering-3d_118019-39.jpg" alt="VPE Logo" class="header-logo">
+                <h1>VPE - Dados Financeiros</h1>
+            </div>
+            <div class="user-section">
+                <div class="user-info">
+                    <span class="user-welcome">Logado como: <strong id="userName">Carregando...</strong></span>
+                </div>
+                <div class="user-actions">
+                    <button onclick="window.location.href='lista_empresas.html'" class="action-btn back-btn">
+                        ← Voltar às Empresas
+                    </button>
+                    <button id="logoutBtn" class="action-btn logout-btn" title="Sair do Sistema">
+                         Sair
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
     <div class="container">
-        <h1>Dados Financeiros</h1>
-        <div id="empresa-info"></div>
-        <div id="tabela-container"></div>
-        <button onclick="window.history.back();">Voltar</button>
+        <!-- Loading state -->
+        <div id="loadingState" class="loading-state" style="display: none;">
+            <div class="loading-spinner"></div>
+            <p>Carregando dados da empresa...</p>
+        </div>
+
+        <!-- Error state -->
+        <div id="errorState" class="error-state" style="display: none;">
+            <h2> Erro ao Carregar Dados</h2>
+            <p id="errorMessage">Erro desconhecido</p>
+            <button onclick="location.reload()" class="retry-btn">Tentar Novamente</button>
+        </div>
+
+        <!-- Conteúdo principal -->
+        <div id="mainContent" style="display: none;">
+            <div id="empresa-info"></div>
+            <div id="tabela-container"></div>
+            
+            <!-- Botões de ação -->
+            <div class="action-buttons">
+                <button onclick="window.history.back();" class="btn-secondary">
+                    ← Voltar
+                </button>
+                <button onclick="window.location.href='lista_empresas.html'" class="btn-primary">
+                     Ver Todas as Empresas
+                </button>
+            </div>
+        </div>
     </div>
 
-    <!-- JavaScript - APENAS o arquivo necessário -->
-    <script type="module" src="dados_financeiros.js"></script>
+    <!-- Scripts de autenticação -->
+    <script src="js/auth.js"></script>
+    <script src="dados_financeiros.js"></script>
 </body>
 </html>

@@ -3,19 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Empresas</title>
+    <title>Lista de Empresas - VPE</title>
     <link rel="stylesheet" href="lista_empresas.css">
 </head>
 <body>
+    <!-- Header com informações do usuário -->
+    <header class="user-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <img src="https://www.probocontabilidade.com.br/wp2019/wp-content/uploads/2019/07/cifrao-em-preto-redering-3d_118019-39.jpg" alt="VPE Logo" class="header-logo">
+                <h1>VPE - Investimentos</h1>
+            </div>
+            <div class="user-section">
+                <div class="user-info">
+                    <span class="user-welcome">Bem-vindo(a), <strong id="userName">Carregando...</strong></span>
+                    <span class="user-type" id="userType"></span>
+                </div>
+                <div class="user-actions">
+                    <button id="favoritosBtn" class="action-btn favorites-btn" title="Meus Favoritos">
+                         Favoritos
+                    </button>
+                    <button id="adminBtn" class="action-btn admin-btn" style="display: none;" title="Área Administrativa">
+                         Admin
+                    </button>
+                    <button id="logoutBtn" class="action-btn logout-btn" title="Sair do Sistema">
+                         Sair
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
     <div class="container">
         <div class="search-box">
-            <input type="text" placeholder="Buscar">
-            <button>🔍</button>
+            <input type="text" id="searchInput" placeholder="Buscar empresas...">
+            <button id="searchBtn">🔍</button>
         </div>
 
-        <div class="empresas"></div>
+        <!-- Loading state -->
+        <div id="loadingState" class="loading-state" style="display: none;">
+            <div class="loading-spinner"></div>
+            <p>Carregando empresas...</p>
+        </div>
+
+        <!-- Error state -->
+        <div id="errorState" class="error-state" style="display: none;">
+            <p>Erro ao carregar empresas. <button onclick="location.reload()">Tentar novamente</button></p>
+        </div>
+
+        <!-- Lista de empresas -->
+        <div class="empresas" id="empresasContainer"></div>
     </div>
-  <script type="module" src="lista.js"></script>
-  <script type="module" src="link.js"></script>
+
+    <!-- Modal de favoritos -->
+    <div id="favoritosModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>❤️ Meus Favoritos</h2>
+                <button class="close-modal" id="closeFavoritos">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="favoritosContainer">
+                    <p>Carregando favoritos...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts de autenticação e funcionalidades -->
+    <script src="js/auth.js"></script>
+    <script src="lista_empresas.js"></script>
 </body>
 </html>

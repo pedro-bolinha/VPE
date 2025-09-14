@@ -1,4 +1,20 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Verificar se o usuário já está logado
+    if (auth.isAuthenticated()) {
+        const user = auth.getCurrentUser();
+        const loginAge = auth.getLoginAge();
+        
+        // Se login é muito antigo, fazer logout
+        if (loginAge >= 24) {
+            auth.logout();
+            return;
+        }
+        
+        // Mostrar opção para continuar logado
+        showContinueLoggedIn(user);
+        return;
+    }
+
     const form = document.querySelector('form');
     const submitButton = form.querySelector('button[type="submit"]');
     const emailInput = document.getElementById('nome');
@@ -6,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Função para mostrar loading
     function showLoading() {
-        submitButton.innerHTML = 'Entrando...';
+        submitButton.innerHTML = '<span class="spinner"></span>Entrando...';
         submitButton.disabled = true;
         submitButton.style.opacity = '0.7';
         submitButton.style.cursor = 'not-allowed';
@@ -83,6 +99,62 @@ document.addEventListener('DOMContentLoaded', function() {
         form.insertBefore(successDiv, submitButton);
     }
 
+    // Função para mostrar opção de continuar logado
+    function showContinueLoggedIn(user) {
+        const continueDiv = document.createElement('div');
+        continueDiv.style.cssText = `
+            background: rgba(52, 152, 219, 0.1);
+            border: 1px solid #3498db;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            font-size: 14px;
+        `;
+        continueDiv.innerHTML = `
+            <div style="margin-bottom: 15px;">
+                <p style="margin: 0 0 5px 0; color: #3498db; font-size: 16px;">
+                    <strong>Olá, ${user.name}!</strong>
+                </p>
+                <p style="margin: 0; color: #666; font-size: 14px;">
+                    Você ainda está logado. Deseja continuar?
+                </p>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                <button type="button" id="continueBtn" 
+                        style="background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 14px;">
+                    Continuar
+                </button>
+                <button type="button" id="newLoginBtn" 
+                        style="background: #95a5a6; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 14px;">
+                    Novo Login
+                </button>
+                <button type="button" id="logoutBtn" 
+                        style="background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 14px;">
+                    Sair
+                </button>
+            </div>
+        `;
+        
+        form.insertBefore(continueDiv, form.firstChild);
+
+        // Event listeners para os botões
+        document.getElementById('continueBtn').addEventListener('click', () => {
+            window.location.href = 'lista_empresas.html';
+        });
+
+        document.getElementById('newLoginBtn').addEventListener('click', () => {
+            continueDiv.remove();
+            emailInput.focus();
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            auth.logout();
+            continueDiv.remove();
+            showSuccess('Logout realizado com sucesso!');
+        });
+    }
+
     // Função para validar email
     function isValidEmail(email) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -135,13 +207,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return true;
     }
 
-    // Função para fazer logout (limpar dados salvos)
-    function logout() {
-        localStorage.removeItem('usuario');
-        sessionStorage.removeItem('usuario');
-        console.log('Usuário deslogado');
-    }
-
     // Event listener para o formulário
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -151,60 +216,36 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        // Coletar dados do formulário
-        const loginData = {
-            email: emailInput.value.trim(),
-            senha: senhaInput.value
-        };
+        const email = emailInput.value.trim();
+        const senha = senhaInput.value;
 
-        console.log('Tentando fazer login com:', loginData.email);
+        console.log(' Tentando fazer login com:', email);
 
         // Mostrar loading
         showLoading();
 
         try {
-            // Enviar dados para o servidor
-            const response = await fetch('/api/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(loginData)
-            });
+            // Usar o método de login do auth manager
+            const result = await auth.login(email, senha);
 
-            const result = await response.json();
-            console.log('Resposta do servidor:', result);
-
-            if (response.ok && result.success) {
-                // Login bem-sucedido
-                console.log('Login realizado com sucesso:', result.usuario);
+            if (result.success) {
+                console.log(' Login realizado com sucesso:', result.user);
                 
                 showSuccess('Login realizado com sucesso! Redirecionando...');
                 
-                // Salvar dados do usuário no localStorage
-                localStorage.setItem('usuario', JSON.stringify(result.usuario));
-                localStorage.setItem('loginTime', new Date().toISOString());
-                
-                // Redirecionar após um breve delay para mostrar a mensagem
+                // Redirecionar após um breve delay
                 setTimeout(() => {
                     window.location.href = 'lista_empresas.html';
                 }, 1500);
 
             } else {
-                // Erro no login
-                console.error('Erro no login:', result.message);
-                throw new Error(result.message || 'Credenciais inválidas');
+                console.error(' Erro no login:', result.message);
+                showError(result.message || 'Credenciais inválidas');
             }
 
         } catch (error) {
-            console.error('Erro na requisição de login:', error);
-            
-            if (error.name === 'TypeError' && error.message.includes('fetch')) {
-                showError('Erro de conexão. Verifique se o servidor está rodando.');
-            } else {
-                showError(error.message || 'Erro ao conectar com o servidor. Tente novamente.');
-            }
+            console.error(' Erro na requisição de login:', error);
+            showError('Erro de conexão. Verifique se o servidor está rodando.');
         } finally {
             hideLoading();
         }
@@ -237,59 +278,30 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Verificar se há um usuário já logado
-    const usuarioLogado = localStorage.getItem('usuario');
-    if (usuarioLogado) {
-        try {
-            const usuario = JSON.parse(usuarioLogado);
-            const loginTime = localStorage.getItem('loginTime');
+    // Botão "Sobre"
+    const btnSobre = document.getElementById('btnSobre');
+    if (btnSobre) {
+        btnSobre.addEventListener('click', function() {
+            alert(`VPE - Sistema de Investimentos
             
-            console.log('Usuário encontrado no localStorage:', usuario);
-            
-            // Verificar se o login não é muito antigo (24 horas)
-            if (loginTime) {
-                const loginDate = new Date(loginTime);
-                const now = new Date();
-                const hoursAgo = (now - loginDate) / (1000 * 60 * 60);
-                
-                if (hoursAgo < 24) {
-                    // Mostrar opção para continuar logado
-                    const continueDiv = document.createElement('div');
-                    continueDiv.style.cssText = `
-                        background: rgba(52, 152, 219, 0.1);
-                        border: 1px solid #3498db;
-                        padding: 12px;
-                        border-radius: 8px;
-                        margin: 15px 0;
-                        text-align: center;
-                        font-size: 14px;
-                    `;
-                    continueDiv.innerHTML = `
-                        <p style="margin: 0 0 10px 0; color: #3498db;">
-                            <strong>Olá, ${usuario.name}!</strong><br>
-                            Você ainda está logado. Deseja continuar?
-                        </p>
-                        <button type="button" onclick="window.location.href='lista_empresas.html'" 
-                                style="background: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 4px; margin-right: 10px; cursor: pointer;">
-                            Continuar
-                        </button>
-                        <button type="button" onclick="this.parentElement.remove(); localStorage.removeItem('usuario'); localStorage.removeItem('loginTime');" 
-                                style="background: #95a5a6; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
-                            Novo Login
-                        </button>
-                    `;
-                    
-                    form.insertBefore(continueDiv, form.firstChild);
-                }
-            }
-        } catch (e) {
-            console.error('Erro ao verificar usuário logado:', e);
-            // Limpar dados corrompidos
-            logout();
-        }
+Versão: 2.0 (com autenticação JWT)
+Desenvolvido para conectar investidores e empresas.
+
+Recursos:
+• Sistema de login seguro com JWT
+• Cadastro de usuários
+• Listagem de empresas
+• Dados financeiros protegidos
+• Sistema de favoritos
+• Área administrativa
+
+Acesso de teste:
+Email: admin@vpe.com
+Senha: admin123 (caso configurado no seed)`);
+        });
     }
 
-    // Adicionar CSS para animações
+    // Adicionar CSS para animações e spinner
     const style = document.createElement('style');
     style.textContent = `
         @keyframes slideIn {
@@ -314,6 +326,22 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top: 2px solid white;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+        
         input:focus {
             outline: none;
             box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2) !important;
@@ -321,5 +349,5 @@ document.addEventListener('DOMContentLoaded', function() {
     `;
     document.head.appendChild(style);
 
-    console.log('Sistema de login inicializado');
+    console.log(' Sistema de login com JWT inicializado');
 });

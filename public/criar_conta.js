@@ -1,4 +1,13 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Verificar se já está logado
+    if (auth.isAuthenticated()) {
+        const user = auth.getCurrentUser();
+        if (confirm(`Você já está logado como ${user.name}. Deseja ir para a lista de empresas?`)) {
+            window.location.href = 'lista_empresas.html';
+            return;
+        }
+    }
+
     const form = document.querySelector('.formulario');
     const submitButton = form.querySelector('button[type="submit"]');
 
@@ -114,8 +123,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     const birthDate = new Date(value);
                     const today = new Date();
                     const age = today.getFullYear() - birthDate.getFullYear();
+                    const monthDiff = today.getMonth() - birthDate.getMonth();
                     
-                    if (age < 18 || (age === 18 && today < new Date(birthDate.setFullYear(birthDate.getFullYear() + 18)))) {
+                    let realAge = age;
+                    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                        realAge--;
+                    }
+                    
+                    if (realAge < 18) {
                         showError(input, 'Você deve ter pelo menos 18 anos');
                         return false;
                     } else {
@@ -155,7 +170,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Função para mostrar mensagem de sucesso
-    function showSuccessMessage() {
+    function showSuccessMessage(user) {
         const overlay = document.createElement('div');
         overlay.className = 'success-overlay';
         
@@ -163,7 +178,8 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="success-box">
                 <div class="success-icon">✓</div>
                 <h3 class="success-title">Conta criada com sucesso!</h3>
-                <p class="success-text">Você será redirecionado para a página de login em alguns segundos...</p>
+                <p class="success-text">Bem-vindo(a), ${user.name}!</p>
+                <p class="success-text">Você será redirecionado para a área de investimentos...</p>
                 <div class="progress-bar">
                     <div class="progress-fill"></div>
                 </div>
@@ -174,7 +190,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Redirecionar após 3 segundos
         setTimeout(() => {
-            window.location.href = 'index.html';
+            window.location.href = 'lista_empresas.html';
         }, 3000);
     }
 
@@ -214,34 +230,30 @@ document.addEventListener('DOMContentLoaded', function() {
             dataNascimento: document.getElementById('dataNascimento').value
         };
 
+        console.log(' Criando conta para:', formData.email);
+
         // Mostrar loading
         showLoading();
 
         try {
-            // Enviar dados para o servidor
-            const response = await fetch('/api/usuarios', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(formData)
-            });
+            // Usar o método de registro do auth manager
+            const result = await auth.register(formData);
 
-            const result = await response.json();
-
-            if (response.ok) {
-                // Sucesso
-                showSuccessMessage();
+            if (result.success) {
+                console.log(' Conta criada com sucesso:', result.user);
+                showSuccessMessage(result.user);
             } else {
-                // Erro do servidor
-                throw new Error(result.message || 'Erro ao criar conta');
+                console.error(' Erro ao criar conta:', result.message);
+                throw new Error(result.message);
             }
 
         } catch (error) {
-            console.error('Erro ao criar conta:', error);
+            console.error(' Erro ao criar conta:', error);
             showErrorAlert(error.message || 'Erro ao conectar com o servidor. Tente novamente.');
         } finally {
             hideLoading();
         }
     });
+
+    console.log(' Sistema de criação de conta com JWT inicializado');
 });
