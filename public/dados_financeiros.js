@@ -132,9 +132,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                                 ${dadosFinanceiros.map((df, index) => {
                                     const valorAnterior = index > 0 ? dadosFinanceiros[index - 1].valor : df.valor;
                                     const crescimento = index > 0 ? ((df.valor - valorAnterior) / valorAnterior * 100) : 0;
-                                    const crescimentoClass = crescimento > 0 ? 'positive' : crescimento < 0 ? 'negative' : 'neutral';
-                                    const crescimentoIcon = crescimento > 0 ? '📈' : crescimento < 0 ? '📉' : '➖';
-                                    
+                             
                                     return `
                                         <tr>
                                             <td>${df.mes}</td>
@@ -148,30 +146,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                                 }).join('')}
                             </tbody>
                         </table>
-                    </div>
-                    
-                    <!-- Resumo estatístico -->
-                    <div class="financial-summary">
-                        <h4> Resumo Estatístico</h4>
-                        <div class="summary-grid">
-                            <div class="summary-item">
-                                <strong> Receita Total:</strong>
-                                <span>R$ ${dadosFinanceiros.reduce((sum, df) => sum + df.valor, 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                            </div>
-                            <div class="summary-item">
-                                <strong> Média Mensal:</strong>
-                                <span>R$ ${(dadosFinanceiros.reduce((sum, df) => sum + df.valor, 0) / dadosFinanceiros.length).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                            </div>
-                            <div class="summary-item">
-                                <strong> Maior Valor:</strong>
-                                <span>R$ ${Math.max(...dadosFinanceiros.map(df => df.valor)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                            </div>
-                            <div class="summary-item">
-                                <strong> Menor Valor:</strong>
-                                <span>R$ ${Math.min(...dadosFinanceiros.map(df => df.valor)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                            </div>
-                        </div>
-                    </div>
+                   
                 `;
                 tabelaContainer.innerHTML = tabelaHTML;
             } else {
@@ -191,9 +166,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             if (empresaAtual.dadosFinanceiros && empresaAtual.dadosFinanceiros.length > 0) {
                 const tabelaHTML = `
                     <h3> Dados Financeiros</h3>
-                    <p style="color: #f39c12; margin-bottom: 20px;">
-                        ⚠️ Mostrando dados básicos (dados detalhados requerem login)
-                    </p>
+                  
                     <table>
                         <thead>
                             <tr>

@@ -6,26 +6,29 @@
 
 h1 {
     text-align: center;
-    color: #f5f2f2;
+    color: #111111;
     margin-bottom: 30px;
+    font-weight: 600;
 }
 
-/* Estilos para informações da empresa */
+/* ===== INFO DA EMPRESA ===== */
 #empresa-info {
     margin-top: 30px;
     padding: 25px;
-    background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+    background: linear-gradient(145deg, #fff, #f8f9fa);
     border-radius: 15px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
     color: #333;
+    animation: fadeIn 0.5s ease-out;
 }
 
 #empresa-info h2 {
     color: #2c3e50;
     margin-bottom: 20px;
-    font-size: 28px;
+    font-size: 26px;
     border-bottom: 3px solid #007BFF;
-    padding-bottom: 10px;
+    padding-bottom: 8px;
+    font-weight: 600;
 }
 
 #empresa-info img {
@@ -34,15 +37,13 @@ h1 {
     height: 200px;
     object-fit: cover;
     border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin: 0 auto 20px auto;
     display: block;
-    margin-left: auto;
-    margin-right: auto;
 }
 
 #empresa-info p {
-    font-size: 16px;
+    font-size: 15px;
     line-height: 1.6;
     margin-bottom: 15px;
     color: #555;
@@ -53,46 +54,45 @@ h1 {
     font-weight: 600;
 }
 
-/* TABELA COM FUNDO COMPLETAMENTE BRANCO */
+/* ===== TABELA ===== */
 #tabela-container {
-    background-color: #ffffff;
+    background: #fff;
     padding: 25px;
     border-radius: 15px;
     margin-top: 30px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
 }
 
 #tabela-container h3 {
     color: #2c3e50;
     margin-bottom: 20px;
-    font-size: 22px;
+    font-size: 20px;
     border-bottom: 2px solid #007BFF;
-    padding-bottom: 8px;
+    padding-bottom: 6px;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
-    background-color: #ffffff !important;
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 table th,
 table td {
-    padding: 15px 20px;
+    padding: 12px 16px;
     text-align: left;
     border-bottom: 1px solid #e9ecef;
-    background-color: #ffffff !important;
-    color: #333 !important;
+    background: #fff;
+    color: #333;
     font-size: 14px;
 }
 
 table th {
-    background: linear-gradient(135deg, #007BFF 0%, #0056b3 100%) !important;
-    color: #ffffff !important;
+    background: linear-gradient(135deg, #007BFF, #0056b3);
+    color: #fff;
     font-weight: 600;
     text-transform: uppercase;
     font-size: 12px;
@@ -100,27 +100,22 @@ table th {
     border-bottom: none;
 }
 
-table tr {
-    background-color: #ffffff !important;
-    transition: all 0.3s ease;
-}
-
 table tr:nth-child(even) {
-    background-color: #f8f9fa !important;
+    background: #f8f9fa;
 }
 
 table tr:hover {
-    background-color: #e3f2fd !important;
+    background: #e3f2fd;
     transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
+    box-shadow: 0 2px 6px rgba(0, 123, 255, 0.15);
 }
 
 table td:last-child {
     font-weight: 600;
-    color: #27ae60 !important;
+    color: #27ae60;
 }
 
-/* Botões de ação */
+/* ===== BOTÕES ===== */
 .action-buttons {
     display: flex;
     justify-content: center;
@@ -129,35 +124,36 @@ table td:last-child {
     flex-wrap: wrap;
 }
 
-.btn-primary, .btn-secondary {
+.btn-primary,
+.btn-secondary {
     padding: 12px 24px;
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 500;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    transition: all 0.3s ease;
+    transition: 0.3s ease;
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #007BFF 0%, #0056b3 100%);
-    color: white;
-    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+    background: linear-gradient(135deg, #007BFF, #0056b3);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, #0056b3 0%, #004494 100%);
+    background: linear-gradient(135deg, #0056b3, #004494);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+    box-shadow: 0 6px 18px rgba(0, 123, 255, 0.4);
 }
 
 .btn-secondary {
     background: #6c757d;
-    color: white;
+    color: #fff;
 }
 
 .btn-secondary:hover {
@@ -165,18 +161,8 @@ table td:last-child {
     transform: translateY(-2px);
 }
 
-/* Responsividade */
+/* ===== RESPONSIVO ===== */
 @media (max-width: 768px) {
-    .header-content {
-        flex-direction: column;
-        gap: 15px;
-    }
-    
-    .user-section {
-        width: 100%;
-        justify-content: center;
-    }
-    
     .container {
         width: 95%;
         padding-top: 10px;
@@ -189,7 +175,7 @@ table td:last-child {
     }
 
     #empresa-info img {
-        max-width: 250px;
+        max-width: 240px;
     }
 
     table th,
@@ -203,23 +189,18 @@ table td:last-child {
         align-items: center;
     }
 
-    .btn-primary, .btn-secondary {
+    .btn-primary,
+    .btn-secondary {
         width: 100%;
-        max-width: 280px;
+        max-width: 260px;
         justify-content: center;
     }
 }
 
-/* Animações */
+/* ===== ANIMAÇÃO ===== */
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(15px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
 #mainContent {

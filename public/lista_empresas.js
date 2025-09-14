@@ -147,7 +147,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                                 ${heartIcon}
                             </span>
                             <a class="more-info" href="dados_financeiros.html?empresa=${encodeURIComponent(empresa.name)}">
-                                📊 Mais informações
+                                 Mais informações
                             </a>
                         </div>
                     </div>
@@ -240,7 +240,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         );
 
         renderEmpresas(filtered);
-        console.log(`🔍 Filtro "${searchTerm}": ${filtered.length} empresas encontradas`);
+        console.log(` Filtro "${searchTerm}": ${filtered.length} empresas encontradas`);
     }
 
     // Mostrar modal de favoritos
