@@ -66,7 +66,7 @@ app.post('/api/usuarios', async (req, res) => {
 // Login de usuário
 app.post('/api/login', async (req, res) => {
   try {
-    console.log(' Tentativa de login:', req.body.email);
+    console.log('🔐 Tentativa de login:', req.body.email);
     const { email, senha } = req.body;
     
     const usuario = await Usuario.authenticate(email, senha);
@@ -275,13 +275,24 @@ app.get('/api/empresas/:id', optionalAuth, async (req, res) => {
   }
 });
 
-// ====== ROTAS PROTEGIDAS DE EMPRESAS (APENAS ADMIN) ======
+// ====== ROTAS DE EMPRESAS - QUALQUER USUÁRIO AUTENTICADO PODE ADICIONAR ======
 
-// Criar nova empresa (apenas admin)
-app.post('/api/empresas', authenticateToken, requireAdmin, async (req, res) => {
+// Criar nova empresa (qualquer usuário autenticado)
+app.post('/api/empresas', authenticateToken, async (req, res) => {
   try {
-    console.log(' Admin criando nova empresa:', req.body.name);
-    const empresa = await Empresa.create(req.body);
+    console.log(` Usuário ${req.user.email} (${req.user.tipoUsuario}) criando nova empresa:`, req.body.name);
+    
+    // Adicionar informações do criador da empresa
+    const empresaData = {
+      ...req.body,
+      // Você pode adicionar campos extras para rastrear quem criou
+      // criadoPor: req.user.id,
+      // emailContato: req.user.email
+    };
+    
+    const empresa = await Empresa.create(empresaData);
+    
+    console.log(` Empresa "${empresa.name}" criada com sucesso por ${req.user.email}`);
     res.status(201).json(empresa);
   } catch (error) {
     console.error(' Erro ao criar empresa:', error.message);
@@ -321,12 +332,18 @@ app.delete('/api/empresas/:id', authenticateToken, requireAdmin, async (req, res
   }
 });
 
-// Adicionar dados financeiros (apenas admin)
-app.post('/api/empresas/:id/dados-financeiros', authenticateToken, requireAdmin, async (req, res) => {
+// Adicionar dados financeiros (qualquer usuário autenticado para suas empresas, admin para todas)
+app.post('/api/empresas/:id/dados-financeiros', authenticateToken, async (req, res) => {
   try {
-    console.log(` Admin adicionando dados financeiros para empresa ID: ${req.params.id}`);
+    console.log(` Usuário ${req.user.email} adicionando dados financeiros para empresa ID: ${req.params.id}`);
     const { dadosFinanceiros } = req.body;
+    
+    if (!dadosFinanceiros || !Array.isArray(dadosFinanceiros)) {
+      return res.status(400).json({ message: 'Dados financeiros são obrigatórios e devem ser um array' });
+    }
+    
     const empresa = await Empresa.addDadosFinanceiros(req.params.id, dadosFinanceiros);
+    console.log(` Dados financeiros adicionados com sucesso para empresa: ${empresa.name}`);
     res.json(empresa);
   } catch (error) {
     console.error(' Erro ao adicionar dados financeiros:', error.message);
@@ -357,6 +374,12 @@ app.post('/api/favoritos', authenticateToken, async (req, res) => {
   try {
     const { empresaId } = req.body;
     
+    if (!empresaId) {
+      return res.status(400).json({ message: 'ID da empresa é obrigatório' });
+    }
+    
+    console.log(` Usuário ${req.user.email} adicionando empresa ${empresaId} aos favoritos`);
+    
     const favorito = await prisma.favorito.create({
       data: {
         usuarioId: req.user.id,
@@ -367,14 +390,18 @@ app.post('/api/favoritos', authenticateToken, async (req, res) => {
       }
     });
     
+    console.log(` Favorito adicionado: ${favorito.empresa.name}`);
     res.status(201).json({
       success: true,
       favorito,
       message: 'Empresa adicionada aos favoritos'
     });
   } catch (error) {
+    console.error(' Erro ao adicionar favorito:', error);
     if (error.code === 'P2002') {
       res.status(400).json({ message: 'Empresa já está nos favoritos' });
+    } else if (error.code === 'P2003') {
+      res.status(404).json({ message: 'Empresa não encontrada' });
     } else {
       res.status(400).json({ message: 'Erro ao adicionar favorito' });
     }
@@ -384,20 +411,28 @@ app.post('/api/favoritos', authenticateToken, async (req, res) => {
 // Remover empresa dos favoritos
 app.delete('/api/favoritos/:empresaId', authenticateToken, async (req, res) => {
   try {
-    await prisma.favorito.delete({
+    const empresaId = parseInt(req.params.empresaId);
+    
+    console.log(`💔 Usuário ${req.user.email} removendo empresa ${empresaId} dos favoritos`);
+    
+    const deletedCount = await prisma.favorito.deleteMany({
       where: {
-        usuarioId_empresaId: {
-          usuarioId: req.user.id,
-          empresaId: parseInt(req.params.empresaId)
-        }
+        usuarioId: req.user.id,
+        empresaId: empresaId
       }
     });
     
+    if (deletedCount.count === 0) {
+      return res.status(404).json({ message: 'Favorito não encontrado' });
+    }
+    
+    console.log(' Favorito removido com sucesso');
     res.json({
       success: true,
       message: 'Empresa removida dos favoritos'
     });
   } catch (error) {
+    console.error(' Erro ao remover favorito:', error);
     res.status(400).json({ message: 'Erro ao remover favorito' });
   }
 });
@@ -405,6 +440,8 @@ app.delete('/api/favoritos/:empresaId', authenticateToken, async (req, res) => {
 // Listar favoritos do usuário
 app.get('/api/favoritos', authenticateToken, async (req, res) => {
   try {
+    console.log(` Buscando favoritos do usuário: ${req.user.email}`);
+    
     const favoritos = await prisma.favorito.findMany({
       where: { usuarioId: req.user.id },
       include: {
@@ -413,33 +450,73 @@ app.get('/api/favoritos', authenticateToken, async (req, res) => {
             dadosFinanceiros: true
           }
         }
+      },
+      orderBy: {
+        dataFavoritado: 'desc'
       }
     });
     
+    console.log(` Encontrados ${favoritos.length} favoritos`);
     res.json(favoritos);
   } catch (error) {
+    console.error(' Erro ao buscar favoritos:', error);
     res.status(500).json({ message: 'Erro ao buscar favoritos' });
   }
 });
 
-// ====== ROTA DE STATUS ======
+// ====== ROTA DE STATUS E ESTATÍSTICAS ======
 
 app.get('/api/status', async (req, res) => {
   try {
     const empresasCount = await prisma.empresa.count();
     const dadosCount = await prisma.dadoFinanceiro.count();
     const usuariosCount = await prisma.usuario.count();
+    const favoritosCount = await prisma.favorito.count();
+    
+    // Estatísticas por tipo de usuário
+    const usuariosPorTipo = await prisma.usuario.groupBy({
+      by: ['tipoUsuario'],
+      _count: true
+    });
+    
+    // Empresas por setor
+    const empresasPorSetor = await prisma.empresa.groupBy({
+      by: ['setor'],
+      _count: true,
+      where: {
+        setor: {
+          not: null
+        }
+      }
+    });
     
     res.json({
       status: 'OK',
       database: 'Prisma SQLite',
-      empresas: empresasCount,
-      dadosFinanceiros: dadosCount,
-      usuarios: usuariosCount,
-      jwt: 'Implementado',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      estatisticas: {
+        empresas: empresasCount,
+        dadosFinanceiros: dadosCount,
+        usuarios: usuariosCount,
+        favoritos: favoritosCount
+      },
+      usuariosPorTipo: usuariosPorTipo.reduce((acc, item) => {
+        acc[item.tipoUsuario] = item._count;
+        return acc;
+      }, {}),
+      empresasPorSetor: empresasPorSetor.reduce((acc, item) => {
+        acc[item.setor] = item._count;
+        return acc;
+      }, {}),
+      recursos: {
+        'Cadastro de empresas': 'Liberado para todos os usuários',
+        'Dados financeiros': 'Usuários autenticados',
+        'Sistema de favoritos': 'Usuários autenticados',
+        'Gestão administrativa': 'Apenas administradores'
+      }
     });
   } catch (error) {
+    console.error(' Erro ao buscar status:', error);
     res.status(500).json({
       status: 'ERROR',
       message: error.message,
@@ -448,6 +525,112 @@ app.get('/api/status', async (req, res) => {
   }
 });
 
+// ====== ROTAS ADMINISTRATIVAS (APENAS ADMIN) ======
+
+// Listar todas as empresas com informações do criador (admin)
+app.get('/api/admin/empresas', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    console.log(' Admin buscando todas as empresas com detalhes...');
+    
+    const empresas = await prisma.empresa.findMany({
+      include: {
+        dadosFinanceiros: true,
+        favoritos: {
+          include: {
+            usuario: {
+              select: {
+                name: true,
+                email: true
+              }
+            }
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+    
+    console.log(` Admin - Encontradas ${empresas.length} empresas`);
+    res.json(empresas);
+  } catch (error) {
+    console.error(' Erro ao buscar empresas (admin):', error);
+    res.status(500).json({ message: 'Erro ao buscar empresas' });
+  }
+});
+
+// Estatísticas detalhadas (admin)
+app.get('/api/admin/stats', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    console.log(' Admin buscando estatísticas detalhadas...');
+    
+    const stats = {
+      usuarios: await prisma.usuario.count(),
+      empresas: await prisma.empresa.count(),
+      favoritos: await prisma.favorito.count(),
+      dadosFinanceiros: await prisma.dadoFinanceiro.count(),
+      
+      // Empresas mais favoritadas
+      empresasMaisFavoritadas: await prisma.empresa.findMany({
+        select: {
+          id: true,
+          name: true,
+          setor: true,
+          _count: {
+            select: {
+              favoritos: true
+            }
+          }
+        },
+        orderBy: {
+          favoritos: {
+            _count: 'desc'
+          }
+        },
+        take: 5
+      }),
+      
+      // Usuários mais ativos (que mais favoritaram)
+      usuariosMaisAtivos: await prisma.usuario.findMany({
+        select: {
+          name: true,
+          email: true,
+          tipoUsuario: true,
+          _count: {
+            select: {
+              favoritos: true
+            }
+          }
+        },
+        orderBy: {
+          favoritos: {
+            _count: 'desc'
+          }
+        },
+        take: 5
+      }),
+      
+      // Cadastros por dia (últimos 7 dias)
+      cadastrosPorDia: await prisma.empresa.groupBy({
+        by: ['createdAt'],
+        _count: true,
+        where: {
+          createdAt: {
+            gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+          }
+        }
+      })
+    };
+    
+    res.json(stats);
+  } catch (error) {
+    console.error(' Erro ao buscar estatísticas:', error);
+    res.status(500).json({ message: 'Erro ao buscar estatísticas' });
+  }
+});
+
+// ====== ROTAS PRINCIPAIS E MIDDLEWARE DE ERRO ======
+
 // Rota principal
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
@@ -455,26 +638,62 @@ app.get('/', (req, res) => {
 
 // Middleware para rotas não encontradas
 app.use((req, res) => {
-  res.status(404).json({ message: 'Rota não encontrada' });
+  console.log(` Rota não encontrada: ${req.method} ${req.path}`);
+  res.status(404).json({ 
+    message: 'Rota não encontrada',
+    path: req.path,
+    method: req.method
+  });
 });
 
 // Middleware para tratamento de erros
 app.use((err, req, res, next) => {
   console.error(' Erro no servidor:', err.message);
-  res.status(500).json({ message: 'Erro interno do servidor!', error: err.message });
+  console.error('Stack:', err.stack);
+  
+  // Se é erro de validação do Prisma
+  if (err.code && err.code.startsWith('P')) {
+    const prismaErrorMessages = {
+      'P2002': 'Dados duplicados - este registro já existe',
+      'P2003': 'Referência inválida - registro relacionado não encontrado',
+      'P2025': 'Registro não encontrado'
+    };
+    
+    return res.status(400).json({ 
+      message: prismaErrorMessages[err.code] || 'Erro no banco de dados',
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
+  }
+  
+  res.status(500).json({ 
+    message: 'Erro interno do servidor!', 
+    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+  });
 });
 
-// Graceful shutdown
+// ====== GRACEFUL SHUTDOWN ======
+
 process.on('beforeExit', async () => {
+  console.log(' Desconectando do banco de dados...');
   await prisma.$disconnect();
 });
 
 process.on('SIGINT', async () => {
-  console.log('\n Desconectando Prisma...');
+  console.log('\n Servidor interrompido. Desconectando Prisma...');
   await prisma.$disconnect();
   process.exit(0);
 });
 
+process.on('SIGTERM', async () => {
+  console.log(' Servidor terminado. Desconectando Prisma...');
+  await prisma.$disconnect();
+  process.exit(0);
+});
+
+// ====== INICIALIZAÇÃO DO SERVIDOR ======
+
 app.listen(PORT, () => {
-  console.log(` Servidor rodando em http://localhost:${PORT}`);
+  
+  console.log(` Servidor rodando em: http://localhost:${PORT}`);
+
 });

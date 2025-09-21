@@ -1,231 +1,244 @@
-// Sistema de Autenticação Simplificado para VPE
-class AuthManager {
-    constructor() {
-        this.TOKEN_KEY = 'vpe_token';
-        this.USER_KEY = 'vpe_user';
-        this.LOGIN_TIME_KEY = 'vpe_login_time';
-    }
-
-    // Salvar autenticação
+// Sistema de Autenticação VPE
+const auth = {
+    // Chaves para localStorage
+    TOKEN_KEY: 'vpe_token',
+    USER_KEY: 'vpe_user',
+    
+    // Configurações
+    API_BASE: '',
+    
+    // Salvar dados de autenticação
     saveAuth(token, user) {
-        try {
-            localStorage.setItem(this.TOKEN_KEY, token);
-            localStorage.setItem(this.USER_KEY, JSON.stringify(user));
-            localStorage.setItem(this.LOGIN_TIME_KEY, Date.now().toString());
-            console.log(' Auth saved:', user.email);
-        } catch (error) {
-            console.error(' Error saving auth:', error);
-        }
-    }
-
+        localStorage.setItem(this.TOKEN_KEY, token);
+        localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+        console.log(' Auth data saved');
+    },
+    
     // Obter token
     getToken() {
         return localStorage.getItem(this.TOKEN_KEY);
-    }
-
-    // Obter usuário
-    getUser() {
-        try {
-            const userData = localStorage.getItem(this.USER_KEY);
-            return userData ? JSON.parse(userData) : null;
-        } catch (error) {
-            console.error(' Error getting user:', error);
-            return null;
-        }
-    }
-
-    // Verificar se está logado
+    },
+    
+    // Obter usuário atual
+    getCurrentUser() {
+        const userStr = localStorage.getItem(this.USER_KEY);
+        return userStr ? JSON.parse(userStr) : null;
+    },
+    
+    // Verificar se está autenticado
     isAuthenticated() {
-        return !!(this.getToken() && this.getUser());
-    }
-
-    // Verificar se é admin
-    isAdmin() {
-        const user = this.getUser();
-        return user?.tipoUsuario === 'admin';
-    }
-
-    // Limpar dados
-    clearAuth() {
-        localStorage.removeItem(this.TOKEN_KEY);
-        localStorage.removeItem(this.USER_KEY);
-        localStorage.removeItem(this.LOGIN_TIME_KEY);
-        console.log(' Logout completed');
-    }
-
-    // Requisição autenticada
+        return !!(this.getToken() && this.getCurrentUser());
+    },
+    
+    // Fazer logout
+    async logout() {
+        try {
+            // Tentar invalidar token no servidor
+            const token = this.getToken();
+            if (token) {
+                await fetch('/api/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+            }
+        } catch (error) {
+            console.warn(' Erro ao fazer logout no servidor:', error.message);
+        } finally {
+            // Limpar dados locais
+            localStorage.removeItem(this.TOKEN_KEY);
+            localStorage.removeItem(this.USER_KEY);
+            
+            console.log(' Logout realizado');
+            window.location.href = '/index.html';
+        }
+    },
+    
+    // Fazer login
+    async login(email, senha) {
+        try {
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, senha })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                this.saveAuth(data.token, data.usuario);
+                return { success: true, user: data.usuario };
+            } else {
+                throw new Error(data.message || 'Erro no login');
+            }
+        } catch (error) {
+            console.error(' Login error:', error);
+            return { success: false, message: error.message };
+        }
+    },
+    
+    // Registrar usuário
+    async register(userData) {
+        try {
+            const response = await fetch('/api/usuarios', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userData)
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+                this.saveAuth(data.token, data.usuario);
+                return { success: true, user: data.usuario };
+            } else {
+                throw new Error(data.message || 'Erro no registro');
+            }
+        } catch (error) {
+            console.error(' Register error:', error);
+            return { success: false, message: error.message };
+        }
+    },
+    
+    // Verificar token no servidor
+    async verifyToken() {
+        const token = this.getToken();
+        if (!token) return false;
+        
+        try {
+            const response = await fetch('/api/verify-token', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success && data.user) {
+                    // Atualizar dados do usuário se necessário
+                    this.saveAuth(token, data.user);
+                    return true;
+                }
+            }
+            
+            return false;
+        } catch (error) {
+            console.warn(' Token verification failed:', error.message);
+            return false;
+        }
+    },
+    
+    // Fazer requisição autenticada
     async authenticatedFetch(url, options = {}) {
         const token = this.getToken();
         
         if (!token) {
             throw new Error('Token não encontrado');
         }
-
-        const response = await fetch(url, {
+        
+        const defaultHeaders = {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        };
+        
+        const config = {
             ...options,
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
+                ...defaultHeaders,
                 ...options.headers
             }
-        });
-
-        // Auto logout em caso de token inválido
-        if (response.status === 401 || response.status === 403) {
-            this.logout();
-            throw new Error('Sessão expirada');
-        }
-
-        return response;
-    }
-
-    // Login
-    async login(email, senha) {
+        };
+        
         try {
-            const response = await fetch('/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, senha })
-            });
-
-            const result = await response.json();
-
-            if (response.ok && result.success) {
-                this.saveAuth(result.token, result.usuario);
-                return { success: true, user: result.usuario };
+            const response = await fetch(url, config);
+            
+            // Se token expirado ou inválido
+            if (response.status === 401 || response.status === 403) {
+                console.warn(' Token expirado ou inválido');
+                this.logout();
+                throw new Error('Sessão expirada');
             }
             
-            return { success: false, message: result.message };
+            return response;
         } catch (error) {
-            console.error(' Login error:', error);
-            return { success: false, message: 'Erro de conexão' };
-        }
-    }
-
-    // Registro
-    async register(userData) {
-        try {
-            const response = await fetch('/api/usuarios', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(userData)
-            });
-
-            const result = await response.json();
-
-            if (response.ok && result.success) {
-                this.saveAuth(result.token, result.usuario);
-                return { success: true, user: result.usuario };
+            if (error.message === 'Sessão expirada') {
+                throw error;
             }
-            
-            return { success: false, message: result.message };
-        } catch (error) {
-            console.error(' Register error:', error);
-            return { success: false, message: 'Erro de conexão' };
+            console.error(' Authenticated fetch error:', error);
+            throw new Error('Erro na requisição autenticada');
         }
-    }
-
-    // Logout
-    async logout() {
-        try {
-            // Tentar notificar servidor
-            if (this.getToken()) {
-                await fetch('/api/logout', {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${this.getToken()}` }
-                }).catch(() => {});
-            }
-        } finally {
-            this.clearAuth();
-            
-            // Redirecionar se necessário
-            if (window.location.pathname !== '/' && window.location.pathname !== '/index.html') {
-                window.location.href = '/';
-            }
-        }
-    }
-
-    // Verificar se precisa estar logado
+    },
+    
+    // Exigir autenticação (redireciona se não autenticado)
     requireAuth() {
         if (!this.isAuthenticated()) {
-            console.warn(' Access denied: not authenticated');
-            window.location.href = '/';
+            console.log(' Autenticação necessária, redirecionando...');
+            window.location.href = '/index.html';
             return false;
         }
         return true;
-    }
-
-    // Verificar se precisa ser admin
-    requireAdmin() {
-        if (!this.requireAuth()) return false;
-        
-        if (!this.isAdmin()) {
-            console.warn(' Access denied: admin required');
-            alert('Acesso negado. Permissão de administrador necessária.');
-            window.history.back();
-            return false;
-        }
-        return true;
-    }
-
-    // Obter usuário atual
-    getCurrentUser() {
-        return this.getUser();
-    }
-
-    // Verificar idade do login (em horas)
-    getLoginAge() {
-        const loginTime = localStorage.getItem(this.LOGIN_TIME_KEY);
-        if (!loginTime) return null;
-        
-        return Math.floor((Date.now() - parseInt(loginTime)) / (1000 * 60 * 60));
-    }
-
-    // Auto logout por tempo
-    checkAutoLogout() {
-        const age = this.getLoginAge();
-        if (age && age >= 24) {
-            console.warn(' Session expired (24h)');
-            this.logout();
-            return true;
-        }
-        return false;
-    }
-
-    // Verificar token no servidor
-    async verifyToken() {
+    },
+    
+    // Verificar se usuário é admin
+    isAdmin() {
+        const user = this.getCurrentUser();
+        return user && user.tipoUsuario === 'admin';
+    },
+    
+    // Verificar se usuário pode adicionar empresas
+    canAddCompany() {
+        const user = this.getCurrentUser();
+        return user && ['admin', 'empresa', 'investidor'].includes(user.tipoUsuario);
+    },
+    
+    // Atualizar token automaticamente
+    async refreshToken() {
         try {
-            const response = await this.authenticatedFetch('/api/verify-token');
-            const result = await response.json();
+            const response = await this.authenticatedFetch('/api/refresh-token', {
+                method: 'POST'
+            });
             
-            return response.ok && result.success;
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success && data.token) {
+                    const currentUser = this.getCurrentUser();
+                    this.saveAuth(data.token, currentUser);
+                    console.log(' Token atualizado');
+                    return true;
+                }
+            }
+            return false;
         } catch (error) {
-            console.error(' Token verification failed:', error);
+            console.warn(' Erro ao atualizar token:', error.message);
             return false;
         }
     }
+};
 
-    // Inicializar sistema
-    init() {
-        // Verificar auto logout
-        this.checkAutoLogout();
-
-        // Verificar token periodicamente (30 minutos)
-        if (this.isAuthenticated()) {
-            setInterval(() => {
-                this.verifyToken().catch(() => {});
-            }, 30 * 60 * 1000);
+// Verificação automática de token ao carregar a página
+document.addEventListener('DOMContentLoaded', async () => {
+    if (auth.isAuthenticated()) {
+        // Verificar se token ainda é válido
+        const isValid = await auth.verifyToken();
+        if (!isValid) {
+            console.warn(' Token inválido detectado');
+            auth.logout();
         }
     }
-}
-
-// Instância global
-const auth = new AuthManager();
-
-// Auto inicializar
-document.addEventListener('DOMContentLoaded', () => {
-    auth.init();
 });
 
-// Exportar globalmente
-window.auth = auth;
+// Auto-refresh do token a cada 30 minutos
+setInterval(async () => {
+    if (auth.isAuthenticated()) {
+        await auth.refreshToken();
+    }
+}, 30 * 60 * 1000);
+
+console.log(' Auth system loaded');

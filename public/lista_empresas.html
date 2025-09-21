@@ -23,6 +23,9 @@
                     <button id="favoritosBtn" class="action-btn favorites-btn" title="Meus Favoritos">
                          Favoritos
                     </button>
+                    <button id="addCompanyBtn" class="action-btn add-company-btn" title="Adicionar Minha Empresa">
+                         Adicionar Empresa
+                    </button>
                     <button id="adminBtn" class="action-btn admin-btn" style="display: none;" title="Área Administrativa">
                          Admin
                     </button>
@@ -35,8 +38,13 @@
     </header>
 
     <div class="container">
+        <!-- Seção de boas-vindas e informações -->
+        <div class="welcome-section">
+            <p>Descubra oportunidades de conhecer empresas e seus trabalhos com ganhos mensais ou cadastre sua empresa para ajudar outras pessoas com o sonho de montar sua propria empresa</p>
+        </div>
+
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Buscar empresas...">
+            <input type="text" id="searchInput" placeholder="Buscar empresas por nome, setor...">
             <button id="searchBtn">🔍</button>
         </div>
 
@@ -66,6 +74,122 @@
                 <div id="favoritosContainer">
                     <p>Carregando favoritos...</p>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para adicionar nova empresa -->
+    <div id="addCompanyModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2> Cadastrar Minha Empresa</h2>
+                <button class="close-modal" id="closeAddCompany">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="info-section">
+                    <p style="color: #ccc; margin-bottom: 20px;">
+                         <strong>Cadastre sua empresa gratuitamente</strong> e conecte-se com investidores interessados no seu negócio!
+                    </p>
+                </div>
+
+                <div id="addCompanyAlerts"></div>
+                
+                <form id="addCompanyForm">
+                    <div class="form-section">
+                        <h3>📋 Informações Básicas</h3>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="companyName">Nome da Empresa *</label>
+                                <input type="text" id="companyName" name="name" required 
+                                       placeholder="Ex: Minha Empresa LTDA" maxlength="100">
+                            </div>
+                            <div class="form-group">
+                                <label for="companySetor">Setor de Atuação</label>
+                                <select id="companySetor" name="setor">
+                                    <option value="">Selecione um setor</option>
+                                    <option value="Alimentício">Alimentício & Bebidas</option>
+                                    <option value="Tecnologia">Tecnologia & Software</option>
+                                    <option value="Varejo">Varejo & E-commerce</option>
+                                    <option value="Serviços">Serviços Profissionais</option>
+                                    <option value="Saúde">Saúde & Bem-estar</option>
+                                    <option value="Educação">Educação & Cursos</option>
+                                    <option value="Financeiro">Serviços Financeiros</option>
+                                    <option value="Imobiliário">Mercado Imobiliário</option>
+                                    <option value="Manufatura">Manufatura & Indústria</option>
+                                    <option value="Logística">Logística & Transporte</option>
+                                    <option value="Esportivo">Esportes & Lazer</option>
+                                    <option value="Beleza">Beleza & Estética</option>
+                                    <option value="Consultoria">Consultoria & Negócios</option>
+                                    <option value="Marketing">Marketing & Publicidade</option>
+                                    <option value="Outros">Outros</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="companyDesc">Descrição da Empresa *</label>
+                            <textarea id="companyDesc" name="descricao" required
+                                      placeholder="Descreva sua empresa, o que ela faz, diferenciais, história..." 
+                                      maxlength="1000" rows="4"></textarea>
+                            <small style="color: #999;">Máximo 1000 caracteres - seja claro sobre seu negócio</small>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="companyPrice">Valor de Investimento Buscado (R$) *</label>
+                                <input type="number" id="companyPrice" name="preco" required 
+                                       placeholder="100000" min="1000" step="1000">
+                                <small style="color: #999;">Quanto você busca de investimento</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="companyImg">Logo/Imagem da Empresa</label>
+                                <input type="url" id="companyImg" name="img" 
+                                       placeholder="https://exemplo.com/logo.jpg">
+                                <small style="color: #999;">URL da imagem (opcional)</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Seção de Dados Financeiros -->
+                    <div class="financial-data-section">
+                        <h3> Dados Financeiros (Opcional)</h3>
+                        <p style="color: #999; font-size: 14px; margin-bottom: 15px;">
+                             Adicione dados de faturamento mensal para atrair mais investidores
+                        </p>
+                        
+                        <div id="financialDataContainer">
+                            <!-- Entradas de dados financeiros serão adicionadas aqui -->
+                        </div>
+                        
+                        <button type="button" id="addFinancialBtn" class="add-financial-btn">
+                             Adicionar Faturamento Mensal
+                        </button>
+                    </div>
+
+                    <!-- Seção de Contato -->
+                    <div class="contact-section">
+                        <h3> Informações de Contato</h3>
+                        <p style="color: #999; font-size: 14px; margin-bottom: 15px;">
+                            Como os investidores podem entrar em contato (utilizaremos os dados do seu perfil)
+                        </p>
+                        <div class="contact-info">
+                            <p style="color: #ccc;">
+                                 <strong>Email:</strong> <span id="userEmail">carregando...</span><br>
+                                 <strong>Contato:</strong> Conforme cadastrado no seu perfil
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" id="cancelAddCompany" class="btn btn-secondary">
+                             Cancelar
+                        </button>
+                        <button type="submit" id="submitAddCompany" class="btn btn-primary">
+                             Cadastrar Empresa
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
