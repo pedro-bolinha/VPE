@@ -336,3 +336,43 @@ h1 {
         left: 10px;
     }
 }
+/* Validação com Zod */
+.formulario input.input-error {
+    border-color: #e74c3c !important;
+    background-color: rgba(231, 76, 60, 0.1) !important;
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.15);
+    animation: shake 0.5s;
+}
+
+.formulario input.input-success {
+    border-color: #27ae60 !important;
+    background-color: rgba(39, 174, 96, 0.1) !important;
+    box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.15);
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.password-strength {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    margin-top: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.error-message {
+    color: #e74c3c;
+    font-size: 13px;
+    margin-top: 5px;
+    animation: slideIn 0.3s ease;
+    display: block;
+    font-weight: 500;
+    padding: 5px 0;
+}
