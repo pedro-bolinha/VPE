@@ -1,6 +1,8 @@
 {
   "name": "vpe",
+  "version": "1.0.0",
   "type": "module",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
@@ -9,7 +11,8 @@
     "db:migrate": "prisma migrate dev",
     "db:seed": "node src/data/seed.js",
     "db:reset": "prisma migrate reset --force && npm run db:seed",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "test:validation": "node test/validation.test.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
@@ -19,24 +22,28 @@
     "express-async-errors": "^3.1.1",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
-    "zod": "^3.25.76"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@prisma/client": "^6.13.0",
     "prisma": "^5.22.0"
   },
-  "version": "1.0.0",
-  "main": "server.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/pedro-bolinha/VPE.git"
   },
-  "keywords": [],
+  "keywords": [
+    "investment",
+    "api",
+    "validation",
+    "zod",
+    "express"
+  ],
   "author": "",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/pedro-bolinha/VPE/issues"
   },
   "homepage": "https://github.com/pedro-bolinha/VPE#readme",
-  "description": ""
+  "description": "Sistema VPE - Validação completa com Zod"
 }

@@ -221,7 +221,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 // Recarregar favoritos
                 await loadFavoritos();
                 
-                console.log(`${addToFavorites ? '❤️ Adicionado aos' : '💔 Removido dos'} favoritos:`, empresaId);
+                console.log(`${addToFavorites ? '❤️ Adicionado aos' : '🤍 Removido dos'} favoritos:`, empresaId);
             } else {
                 throw new Error('Erro ao atualizar favorito');
             }
