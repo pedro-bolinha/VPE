@@ -55,6 +55,211 @@ document.addEventListener('DOMContentLoaded', async function () {
             showError('Erro ao carregar dados iniciais');
         }
     }
+    // 6. MODIFICAR lista_empresas.js - ADICIONAR LÓGICA
+// ============================================
+// Adicionar após a função setupEventListeners():
+
+// Estado para controle de upload
+let uploadedImageFile = null;
+let uploadedImageUrl = null;
+
+// Configurar upload de imagem
+function setupImageUpload() {
+  const fileInput = document.getElementById('companyImg');
+  const uploadTrigger = document.getElementById('uploadTrigger');
+  const imagePreview = document.getElementById('imagePreview');
+  const previewImg = document.getElementById('previewImg');
+  const removeImageBtn = document.getElementById('removeImage');
+  const uploadedImageUrlInput = document.getElementById('uploadedImageUrl');
+
+  // Trigger para abrir seleção de arquivo
+  uploadTrigger.addEventListener('click', () => {
+    fileInput.click();
+  });
+
+  // Quando arquivo é selecionado
+  fileInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    
+    if (!file) return;
+
+    // Validar tipo de arquivo
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      showAlert('Formato de imagem não suportado. Use JPG, PNG, GIF ou WEBP.', 'error');
+      return;
+    }
+
+    // Validar tamanho (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      showAlert('Imagem muito grande. Tamanho máximo: 5MB', 'error');
+      return;
+    }
+
+    // Mostrar preview local
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      previewImg.src = e.target.result;
+      imagePreview.style.display = 'block';
+      uploadTrigger.style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+
+    // Armazenar arquivo para upload posterior
+    uploadedImageFile = file;
+    uploadedImageUrl = null; // Resetar URL anterior
+  });
+
+  // Remover imagem
+  removeImageBtn.addEventListener('click', () => {
+    fileInput.value = '';
+    uploadedImageFile = null;
+    uploadedImageUrl = null;
+    uploadedImageUrlInput.value = '';
+    imagePreview.style.display = 'none';
+    uploadTrigger.style.display = 'inline-flex';
+  });
+}
+
+// Função para fazer upload da imagem antes de criar empresa
+async function uploadCompanyImage() {
+  if (!uploadedImageFile) {
+    return null; // Nenhum arquivo para fazer upload
+  }
+
+  try {
+    const formData = new FormData();
+    formData.append('image', uploadedImageFile);
+
+    const response = await auth.authenticatedFetch('/api/upload/empresa-image', {
+      method: 'POST',
+      body: formData,
+      // NÃO definir Content-Type - deixar o browser definir com boundary
+      headers: {} 
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Erro no upload');
+    }
+
+    const result = await response.json();
+    return result.imageUrl;
+
+  } catch (error) {
+    console.error('❌ Erro no upload:', error);
+    throw error;
+  }
+}
+
+// MODIFICAR: submitAddCompanyForm
+async function submitAddCompanyForm(event) {
+  event.preventDefault();
+  clearAlerts();
+
+  try {
+    elements.submitAddCompany.disabled = true;
+    elements.submitAddCompany.innerHTML = '⏳ Processando...';
+
+    // 1. Fazer upload da imagem primeiro (se houver)
+    let imageUrl = null;
+    if (uploadedImageFile) {
+      elements.submitAddCompany.innerHTML = '📷 Enviando imagem...';
+      imageUrl = await uploadCompanyImage();
+      console.log('✅ Imagem enviada:', imageUrl);
+    }
+
+    // 2. Coletar dados do formulário
+    const formData = new FormData(elements.addCompanyForm);
+    const companyData = {
+      name: formData.get('name')?.trim(),
+      descricao: formData.get('descricao')?.trim(),
+      img: imageUrl || 'https://via.placeholder.com/300x200?text=Nova+Empresa',
+      preco: parseFloat(formData.get('preco')),
+      setor: formData.get('setor') || 'Outros'
+    };
+
+    // 3. Validar dados
+    const errors = validateAddCompanyForm(companyData);
+    let financialData = [];
+    try {
+      financialData = collectFinancialData();
+    } catch (financialError) {
+      errors.push(financialError.message);
+    }
+
+    if (errors.length > 0) {
+      errors.forEach(error => showAlert(error, 'error'));
+      return;
+    }
+
+    // 4. Confirmar cadastro
+    const confirmMessage = `
+      Confirmar cadastro da empresa "${companyData.name}"?
+      
+      • Setor: ${companyData.setor}
+      • Investimento: R$ ${companyData.preco.toLocaleString('pt-BR')}
+      ${imageUrl ? '• Imagem: ✅ Enviada' : ''}
+      ${financialData.length > 0 ? `• Dados financeiros: ${financialData.length} meses` : ''}
+    `;
+    
+    if (!confirm(confirmMessage)) {
+      return;
+    }
+
+    // 5. Criar empresa
+    elements.submitAddCompany.innerHTML = '💼 Criando empresa...';
+    const response = await auth.authenticatedFetch('/api/empresas', {
+      method: 'POST',
+      body: JSON.stringify(companyData)
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message || 'Erro ao cadastrar empresa');
+    }
+
+    showAlert('✅ Empresa cadastrada com sucesso!', 'success');
+
+    // 6. Adicionar dados financeiros se houver
+    if (financialData.length > 0) {
+      try {
+        const financialResponse = await auth.authenticatedFetch(
+          `/api/empresas/${result.id}/dados-financeiros`, 
+          {
+            method: 'POST',
+            body: JSON.stringify({ dadosFinanceiros: financialData })
+          }
+        );
+
+        if (financialResponse.ok) {
+          showAlert('📊 Dados financeiros adicionados!', 'success');
+        }
+      } catch (financialError) {
+        console.warn('⚠️ Erro nos dados financeiros:', financialError);
+        showAlert('⚠️ Empresa criada, mas dados financeiros não foram salvos', 'warning');
+      }
+    }
+    
+    // 7. Recarregar e fechar
+    await loadEmpresas();
+    
+    setTimeout(() => {
+      hideAddCompanyModal();
+      showTemporaryMessage('🎉 Sua empresa foi cadastrada com sucesso!', 'success');
+    }, 2000);
+
+    console.log('✅ Nova empresa cadastrada:', result.name);
+
+  } catch (error) {
+    console.error('❌ Erro ao cadastrar empresa:', error);
+    showAlert(error.message || 'Erro ao cadastrar empresa', 'error');
+  } finally {
+    elements.submitAddCompany.disabled = false;
+    elements.submitAddCompany.innerHTML = '💼 Cadastrar Empresa';
+  }
+}
 
     // Atualizar interface do usuário
     function updateUserInterface() {

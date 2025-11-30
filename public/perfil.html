@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Perfil - VPE</title>
+    <link rel="stylesheet" href="perfil.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="user-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <img src="https://www.probocontabilidade.com.br/wp2019/wp-content/uploads/2019/07/cifrao-em-preto-redering-3d_118019-39.jpg" alt="VPE Logo" class="header-logo">
+                <h1>VPE - Meu Perfil</h1>
+            </div>
+            <div class="user-actions">
+                <button onclick="history.back()" class="action-btn back-btn">
+                    ← Voltar
+                </button>
+                <button id="logoutBtn" class="action-btn logout-btn">
+                    🚪 Sair
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-state">
+            <div class="loading-spinner"></div>
+            <p>Carregando perfil...</p>
+        </div>
+
+        <!-- Conteúdo Principal -->
+        <div id="mainContent" style="display: none;">
+            <div class="profile-container">
+                <!-- Seção do Avatar -->
+                <div class="avatar-section">
+                    <h2>📸 Foto de Perfil</h2>
+                    <div class="avatar-upload-container">
+                        <div class="avatar-preview" id="avatarPreview">
+                            <img id="currentAvatar" src="" alt="Avatar" style="display: none;">
+                            <div class="avatar-placeholder">
+                                <span>👤</span>
+                                <p>Clique ou arraste uma foto</p>
+                            </div>
+                        </div>
+                        <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+                        <button id="uploadAvatarBtn" class="btn btn-primary">
+                            📤 Escolher Foto
+                        </button>
+                        <button id="saveAvatarBtn" class="btn btn-success" style="display: none;">
+                            💾 Salvar Avatar
+                        </button>
+                        <p class="upload-hint">
+                            Formatos: JPEG, PNG, GIF, WebP • Tamanho máx: 5MB
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Seção de Informações -->
+                <div class="info-section">
+                    <h2>ℹ️ Informações do Perfil</h2>
+                    <form id="profileForm">
+                        <div class="form-group">
+                            <label for="userName">Nome Completo</label>
+                            <input type="text" id="userName" name="name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="userEmail">E-mail</label>
+                            <input type="email" id="userEmail" readonly disabled>
+                            <small>O e-mail não pode ser alterado</small>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="userTelefone1">Telefone Principal</label>
+                                <input type="tel" id="userTelefone1" name="telefone1" placeholder="(00) 00000-0000">
+                            </div>
+                            <div class="form-group">
+                                <label for="userTelefone2">Telefone Secundário</label>
+                                <input type="tel" id="userTelefone2" name="telefone2" placeholder="(00) 00000-0000">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="userCpfCnpj">CPF/CNPJ</label>
+                            <input type="text" id="userCpfCnpj" name="cpfCnpj" placeholder="000.000.000-00">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Tipo de Usuário</label>
+                            <div class="user-type-badge" id="userType"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Membro desde</label>
+                            <input type="text" id="userCreatedAt" readonly disabled>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" onclick="history.back()" class="btn btn-secondary">
+                                Cancelar
+                            </button>
+                            <button type="submit" id="saveProfileBtn" class="btn btn-primary">
+                                💾 Salvar Alterações
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/auth.js"></script>
+    <script src="js/imageUpload.js"></script>
+    <script src="perfil.js"></script>
+</body>
+</html>

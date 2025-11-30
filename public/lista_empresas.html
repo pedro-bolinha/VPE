@@ -142,12 +142,28 @@
                                        placeholder="100000" min="1000" step="1000">
                                 <small style="color: #999;">Quanto você busca de investimento</small>
                             </div>
-                            <div class="form-group">
-                                <label for="companyImg">Logo/Imagem da Empresa</label>
-                                <input type="url" id="companyImg" name="img" 
-                                       placeholder="https://exemplo.com/logo.jpg">
-                                <small style="color: #999;">URL da imagem (opcional)</small>
-                            </div>
+                            
+<div class="form-group">
+  <label for="companyImg">Logo/Imagem da Empresa</label>
+  <div class="file-upload-wrapper">
+    <input type="file" id="companyImg" name="image" 
+           accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+           style="display: none;">
+    <button type="button" id="uploadTrigger" class="upload-trigger-btn">
+      📷 Escolher Imagem
+    </button>
+    <div id="imagePreview" class="image-preview" style="display: none;">
+      <img id="previewImg" src="" alt="Preview">
+      <button type="button" id="removeImage" class="remove-image-btn">
+        🗑️ Remover
+      </button>
+    </div>
+  </div>
+  <small style="color: #999;">
+    Formatos aceitos: JPG, PNG, GIF, WEBP (máx. 5MB)
+  </small>
+  <input type="hidden" id="uploadedImageUrl" name="img">
+</div>
                         </div>
                     </div>
 
@@ -191,9 +207,10 @@
                     </div>
                 </form>
             </div>
+            
         </div>
     </div>
-
+    
     <!-- Scripts de autenticação e funcionalidades -->
     <script src="js/auth.js"></script>
     <script src="lista_empresas.js"></script>

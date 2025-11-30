@@ -22,7 +22,8 @@
     "express-async-errors": "^3.1.1",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
-    "zod": "^3.23.8"
+    "nodemailer": "^6.10.1",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@prisma/client": "^6.13.0",
@@ -37,7 +38,9 @@
     "api",
     "validation",
     "zod",
-    "express"
+    "express",
+    "email",
+    "nodemailer"
   ],
   "author": "",
   "license": "ISC",
@@ -45,5 +48,5 @@
     "url": "https://github.com/pedro-bolinha/VPE/issues"
   },
   "homepage": "https://github.com/pedro-bolinha/VPE#readme",
-  "description": "Sistema VPE - Validação completa com Zod"
+  "description": "Sistema VPE - Validação completa com Zod e envio de emails"
 }

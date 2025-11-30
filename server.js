@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url';
 import Empresa from './src/models/empresa.js';
 import Usuario from './src/models/usuario.js';
 import prisma from './src/lib/prisma.js';
+import emailService from './src/services/emailService.js';
 import { 
   authenticateToken, 
   requireAdmin, 
@@ -53,12 +54,12 @@ app.use(cookieParser());
 // Servir arquivos estáticos
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ====== ROTAS DE AUTENTICAÇÃO COM VALIDAÇÃO ======
+// ====== ROTAS DE AUTENTICAÇÃO COM VALIDAÇÃO E EMAIL ======
 
-// Criar usuário (registro) - COM VALIDAÇÃO ZOD
+// Criar usuário (registro) - COM VALIDAÇÃO ZOD E EMAIL
 app.post('/api/usuarios', validate(createUserSchema), async (req, res) => {
   try {
-    console.log(' Criando novo usuário:', req.body.email);
+    console.log('🔐 Criando novo usuário:', req.body.email);
     
     // req.body já foi validado pelo middleware Zod
     const usuario = await Usuario.create(req.body);
@@ -66,15 +67,28 @@ app.post('/api/usuarios', validate(createUserSchema), async (req, res) => {
     // Gerar token JWT automaticamente após registro
     const token = generateToken(usuario);
     
-    console.log(' Usuário criado com sucesso:', usuario.email);
+    // 📧 ENVIAR EMAIL DE BOAS-VINDAS
+    console.log('📧 Enviando email de boas-vindas...');
+    const emailResult = await emailService.sendWelcomeEmail(usuario.email, usuario.name);
+    
+    if (emailResult.success) {
+      console.log('✅ Email enviado com sucesso!');
+      console.log('🔗 Visualizar em:', emailResult.previewUrl);
+    } else {
+      console.warn('⚠️ Falha ao enviar email:', emailResult.error);
+    }
+    
+    console.log('✅ Usuário criado com sucesso:', usuario.email);
     res.status(201).json({
       success: true,
       usuario,
       token,
-      message: 'Usuário criado com sucesso'
+      message: 'Usuário criado com sucesso',
+      emailSent: emailResult.success,
+      emailPreviewUrl: emailResult.previewUrl
     });
   } catch (error) {
-    console.error(' Erro ao criar usuário:', error.message);
+    console.error('❌ Erro ao criar usuário:', error.message);
     res.status(400).json({ success: false, message: error.message });
   }
 });
@@ -82,7 +96,7 @@ app.post('/api/usuarios', validate(createUserSchema), async (req, res) => {
 // Login de usuário - COM VALIDAÇÃO ZOD
 app.post('/api/login', validate(loginSchema), async (req, res) => {
   try {
-    console.log(' Tentativa de login:', req.body.email);
+    console.log('🔐 Tentativa de login:', req.body.email);
     
     // req.body já validado
     const { email, senha } = req.body;
@@ -92,7 +106,7 @@ app.post('/api/login', validate(loginSchema), async (req, res) => {
     // Gerar token JWT
     const token = generateToken(usuario);
     
-    console.log(' Login realizado com sucesso:', usuario.email);
+    console.log('✅ Login realizado com sucesso:', usuario.email);
     res.json({ 
       success: true, 
       usuario,
@@ -100,7 +114,7 @@ app.post('/api/login', validate(loginSchema), async (req, res) => {
       message: 'Login realizado com sucesso' 
     });
   } catch (error) {
-    console.error(' Erro no login:', error.message);
+    console.error('❌ Erro no login:', error.message);
     res.status(401).json({ 
       success: false, 
       message: error.message 
@@ -120,7 +134,7 @@ app.get('/api/verify-token', authenticateToken, async (req, res) => {
 
 // Logout (invalidar token do lado do cliente)
 app.post('/api/logout', (req, res) => {
-  console.log(' Usuário fazendo logout');
+  console.log('🚪 Usuário fazendo logout');
   res.json({
     success: true,
     message: 'Logout realizado com sucesso'
@@ -160,18 +174,18 @@ app.get('/api/usuarios/:id',
   validate(idParamSchema),
   async (req, res) => {
     try {
-      const idSolicitado = req.params.id; // Já transformado em number pelo Zod
+      const idSolicitado = req.params.id;
       
       // Verificar se é admin ou se está acessando próprio perfil
       if (req.user.tipoUsuario !== 'admin' && req.user.id !== idSolicitado) {
         return res.status(403).json({ message: 'Acesso negado' });
       }
       
-      console.log(` Buscando usuário ID: ${idSolicitado}`);
+      console.log(`👤 Buscando usuário ID: ${idSolicitado}`);
       const usuario = await Usuario.readById(idSolicitado);
       res.json(usuario);
     } catch (error) {
-      console.error(' Erro ao buscar usuário por ID:', error.message);
+      console.error('❌ Erro ao buscar usuário por ID:', error.message);
       if (error.message === 'Usuário não encontrado') {
         res.status(404).json({ message: error.message });
       } else {
@@ -184,12 +198,12 @@ app.get('/api/usuarios/:id',
 // Listar usuários (apenas admin)
 app.get('/api/usuarios', authenticateToken, requireAdmin, async (req, res) => {
   try {
-    console.log(' Admin listando usuários...');
+    console.log('👥 Admin listando usuários...');
     const usuarios = await Usuario.read();
-    console.log(` Encontrados ${usuarios.length} usuários`);
+    console.log(`✅ Encontrados ${usuarios.length} usuários`);
     res.json(usuarios);
   } catch (error) {
-    console.error(' Erro ao listar usuários:', error.message);
+    console.error('❌ Erro ao listar usuários:', error.message);
     res.status(500).json({ message: 'Erro ao buscar usuários', error: error.message });
   }
 });
@@ -200,18 +214,18 @@ app.put('/api/usuarios/:id',
   validate(updateUserSchema),
   async (req, res) => {
     try {
-      const idSolicitado = req.params.id; // Já validado e transformado
+      const idSolicitado = req.params.id;
       
       // Verificar se é admin ou se está editando próprio perfil
       if (req.user.tipoUsuario !== 'admin' && req.user.id !== idSolicitado) {
         return res.status(403).json({ message: 'Acesso negado' });
       }
       
-      console.log(` Atualizando usuário ID: ${idSolicitado}`);
+      console.log(`✏️ Atualizando usuário ID: ${idSolicitado}`);
       const usuario = await Usuario.update({ ...req.body, id: idSolicitado });
       res.json(usuario);
     } catch (error) {
-      console.error(' Erro ao atualizar usuário:', error.message);
+      console.error('❌ Erro ao atualizar usuário:', error.message);
       if (error.message === 'Usuário não encontrado') {
         res.status(404).json({ message: error.message });
       } else {
@@ -228,11 +242,11 @@ app.delete('/api/usuarios/:id',
   validate(idParamSchema),
   async (req, res) => {
     try {
-      console.log(` Admin removendo usuário ID: ${req.params.id}`);
+      console.log(`🗑️ Admin removendo usuário ID: ${req.params.id}`);
       await Usuario.remove(req.params.id);
       res.sendStatus(204);
     } catch (error) {
-      console.error(' Erro ao remover usuário:', error.message);
+      console.error('❌ Erro ao remover usuário:', error.message);
       if (error.message === 'Usuário não encontrado') {
         res.status(404).json({ message: error.message });
       } else {
@@ -242,22 +256,22 @@ app.delete('/api/usuarios/:id',
   }
 );
 
-// ====== ROTAS DE EMPRESAS COM VALIDAÇÃO ======
+// ====== ROTAS DE EMPRESAS COM VALIDAÇÃO E EMAIL ======
 
 // Listar empresas (rota pública com auth opcional) - COM VALIDAÇÃO DE QUERY
 app.get('/empresas', optionalAuth, validate(searchEmpresasSchema), async (req, res) => {
   try {
-    console.log(' Buscando empresas...');
+    console.log('🏢 Buscando empresas...');
     const empresas = await Empresa.read();
-    console.log(` Encontradas ${empresas.length} empresas`);
+    console.log(`✅ Encontradas ${empresas.length} empresas`);
     
     if (req.user) {
-      console.log(` Usuário autenticado: ${req.user.email}`);
+      console.log(`👤 Usuário autenticado: ${req.user.email}`);
     }
     
     res.json(empresas);
   } catch (error) {
-    console.error(' Erro ao buscar empresas:', error.message);
+    console.error('❌ Erro ao buscar empresas:', error.message);
     res.status(500).json({ message: 'Erro ao buscar empresas', error: error.message });
   }
 });
@@ -265,8 +279,8 @@ app.get('/empresas', optionalAuth, validate(searchEmpresasSchema), async (req, r
 // API REST para empresas (pública) - COM VALIDAÇÃO
 app.get('/api/empresas', optionalAuth, validate(searchEmpresasSchema), async (req, res) => {
   try {
-    console.log(' API - Buscando empresas...');
-    const { name, setor } = req.query; // Query já validada
+    console.log('🏢 API - Buscando empresas...');
+    const { name, setor } = req.query;
     
     let empresas;
     if (name || setor) {
@@ -281,10 +295,10 @@ app.get('/api/empresas', optionalAuth, validate(searchEmpresasSchema), async (re
       empresas = await Empresa.read();
     }
     
-    console.log(` API - Retornadas ${empresas.length} empresas`);
+    console.log(`✅ API - Retornadas ${empresas.length} empresas`);
     res.json(empresas);
   } catch (error) {
-    console.error(' Erro na API empresas:', error.message);
+    console.error('❌ Erro na API empresas:', error.message);
     res.status(500).json({ message: 'Erro ao buscar empresas', error: error.message });
   }
 });
@@ -295,11 +309,11 @@ app.get('/api/empresas/:id',
   validate(idParamSchema),
   async (req, res) => {
     try {
-      console.log(` Buscando empresa ID: ${req.params.id}`);
+      console.log(`🔍 Buscando empresa ID: ${req.params.id}`);
       const empresa = await Empresa.readById(req.params.id);
       res.json(empresa);
     } catch (error) {
-      console.error(' Erro ao buscar empresa por ID:', error.message);
+      console.error('❌ Erro ao buscar empresa por ID:', error.message);
       if (error.message === 'Empresa não encontrada') {
         res.status(404).json({ message: error.message });
       } else {
@@ -309,21 +323,46 @@ app.get('/api/empresas/:id',
   }
 );
 
-// Criar nova empresa - COM VALIDAÇÃO COMPLETA
+// Criar nova empresa - COM VALIDAÇÃO COMPLETA E EMAIL
 app.post('/api/empresas', 
   authenticateToken, 
   validate(createEmpresaSchema), 
   async (req, res) => {
     try {
-      console.log(` Usuário ${req.user.email} (${req.user.tipoUsuario}) criando nova empresa:`, req.body.name);
+      console.log(`🏢 Usuário ${req.user.email} (${req.user.tipoUsuario}) criando nova empresa:`, req.body.name);
       
       // req.body já totalmente validado pelo Zod
       const empresa = await Empresa.create(req.body);
       
-      console.log(` Empresa "${empresa.name}" criada com sucesso por ${req.user.email}`);
-      res.status(201).json(empresa);
+      // 📧 ENVIAR EMAIL DE CONFIRMAÇÃO
+      console.log('📧 Enviando email de confirmação de empresa...');
+      const emailResult = await emailService.sendNewCompanyEmail(
+        req.user.email,
+        req.user.name,
+        empresa.name,
+        {
+          descricao: empresa.descricao,
+          img: empresa.img,
+          preco: empresa.preco,
+          setor: empresa.setor
+        }
+      );
+      
+      if (emailResult.success) {
+        console.log('✅ Email de empresa enviado com sucesso!');
+        console.log('🔗 Visualizar em:', emailResult.previewUrl);
+      } else {
+        console.warn('⚠️ Falha ao enviar email:', emailResult.error);
+      }
+      
+      console.log(`✅ Empresa "${empresa.name}" criada com sucesso por ${req.user.email}`);
+      res.status(201).json({
+        ...empresa,
+        emailSent: emailResult.success,
+        emailPreviewUrl: emailResult.previewUrl
+      });
     } catch (error) {
-      console.error(' Erro ao criar empresa:', error.message);
+      console.error('❌ Erro ao criar empresa:', error.message);
       res.status(400).json({ message: error.message });
     }
   }
@@ -336,11 +375,11 @@ app.put('/api/empresas/:id',
   validate(updateEmpresaSchema),
   async (req, res) => {
     try {
-      console.log(` Admin atualizando empresa ID: ${req.params.id}`);
+      console.log(`✏️ Admin atualizando empresa ID: ${req.params.id}`);
       const empresa = await Empresa.update({ ...req.body, id: req.params.id });
       res.json(empresa);
     } catch (error) {
-      console.error(' Erro ao atualizar empresa:', error.message);
+      console.error('❌ Erro ao atualizar empresa:', error.message);
       if (error.message === 'Empresa não encontrada') {
         res.status(404).json({ message: error.message });
       } else {
@@ -357,11 +396,11 @@ app.delete('/api/empresas/:id',
   validate(idParamSchema),
   async (req, res) => {
     try {
-      console.log(` Admin removendo empresa ID: ${req.params.id}`);
+      console.log(`🗑️ Admin removendo empresa ID: ${req.params.id}`);
       await Empresa.remove(req.params.id);
       res.sendStatus(204);
     } catch (error) {
-      console.error(' Erro ao remover empresa:', error.message);
+      console.error('❌ Erro ao remover empresa:', error.message);
       if (error.message === 'Empresa não encontrada') {
         res.status(404).json({ message: error.message });
       } else {
@@ -377,16 +416,15 @@ app.post('/api/empresas/:id/dados-financeiros',
   validate(addDadosFinanceirosSchema),
   async (req, res) => {
     try {
-      console.log(` Usuário ${req.user.email} adicionando dados financeiros para empresa ID: ${req.params.id}`);
+      console.log(`💰 Usuário ${req.user.email} adicionando dados financeiros para empresa ID: ${req.params.id}`);
       
-      // req.body.dadosFinanceiros já validado pelo Zod
       const { dadosFinanceiros } = req.body;
       
       const empresa = await Empresa.addDadosFinanceiros(req.params.id, dadosFinanceiros);
-      console.log(` Dados financeiros adicionados com sucesso para empresa: ${empresa.name}`);
+      console.log(`✅ Dados financeiros adicionados com sucesso para empresa: ${empresa.name}`);
       res.json(empresa);
     } catch (error) {
-      console.error(' Erro ao adicionar dados financeiros:', error.message);
+      console.error('❌ Erro ao adicionar dados financeiros:', error.message);
       if (error.message === 'Empresa não encontrada') {
         res.status(404).json({ message: error.message });
       } else {
@@ -402,11 +440,11 @@ app.get('/api/empresas/:id/dados-financeiros',
   validate(idParamSchema),
   async (req, res) => {
     try {
-      console.log(` Usuário ${req.user.email} buscando dados financeiros da empresa ID: ${req.params.id}`);
+      console.log(`📊 Usuário ${req.user.email} buscando dados financeiros da empresa ID: ${req.params.id}`);
       const dados = await Empresa.getDadosFinanceiros(req.params.id);
       res.json(dados);
     } catch (error) {
-      console.error(' Erro ao buscar dados financeiros:', error.message);
+      console.error('❌ Erro ao buscar dados financeiros:', error.message);
       res.status(500).json({ message: error.message });
     }
   }
@@ -420,9 +458,9 @@ app.post('/api/favoritos',
   validate(addFavoritoSchema),
   async (req, res) => {
     try {
-      const { empresaId } = req.body; // Já validado pelo Zod
+      const { empresaId } = req.body;
       
-      console.log(` Usuário ${req.user.email} adicionando empresa ${empresaId} aos favoritos`);
+      console.log(`❤️ Usuário ${req.user.email} adicionando empresa ${empresaId} aos favoritos`);
       
       const favorito = await prisma.favorito.create({
         data: {
@@ -434,14 +472,14 @@ app.post('/api/favoritos',
         }
       });
       
-      console.log(` Favorito adicionado: ${favorito.empresa.name}`);
+      console.log(`✅ Favorito adicionado: ${favorito.empresa.name}`);
       res.status(201).json({
         success: true,
         favorito,
         message: 'Empresa adicionada aos favoritos'
       });
     } catch (error) {
-      console.error(' Erro ao adicionar favorito:', error);
+      console.error('❌ Erro ao adicionar favorito:', error);
       if (error.code === 'P2002') {
         res.status(400).json({ message: 'Empresa já está nos favoritos' });
       } else if (error.code === 'P2003') {
@@ -459,9 +497,9 @@ app.delete('/api/favoritos/:empresaId',
   validate(idParamSchema),
   async (req, res) => {
     try {
-      const empresaId = req.params.empresaId; // Já validado e transformado
+      const empresaId = req.params.empresaId;
       
-      console.log(` Usuário ${req.user.email} removendo empresa ${empresaId} dos favoritos`);
+      console.log(`💔 Usuário ${req.user.email} removendo empresa ${empresaId} dos favoritos`);
       
       const deletedCount = await prisma.favorito.deleteMany({
         where: {
@@ -474,13 +512,13 @@ app.delete('/api/favoritos/:empresaId',
         return res.status(404).json({ message: 'Favorito não encontrado' });
       }
       
-      console.log(' Favorito removido com sucesso');
+      console.log('✅ Favorito removido com sucesso');
       res.json({
         success: true,
         message: 'Empresa removida dos favoritos'
       });
     } catch (error) {
-      console.error(' Erro ao remover favorito:', error);
+      console.error('❌ Erro ao remover favorito:', error);
       res.status(400).json({ message: 'Erro ao remover favorito' });
     }
   }
@@ -489,7 +527,7 @@ app.delete('/api/favoritos/:empresaId',
 // Listar favoritos do usuário
 app.get('/api/favoritos', authenticateToken, async (req, res) => {
   try {
-    console.log(` Buscando favoritos do usuário: ${req.user.email}`);
+    console.log(`❤️ Buscando favoritos do usuário: ${req.user.email}`);
     
     const favoritos = await prisma.favorito.findMany({
       where: { usuarioId: req.user.id },
@@ -505,10 +543,10 @@ app.get('/api/favoritos', authenticateToken, async (req, res) => {
       }
     });
     
-    console.log(` Encontrados ${favoritos.length} favoritos`);
+    console.log(`✅ Encontrados ${favoritos.length} favoritos`);
     res.json(favoritos);
   } catch (error) {
-    console.error(' Erro ao buscar favoritos:', error);
+    console.error('❌ Erro ao buscar favoritos:', error);
     res.status(500).json({ message: 'Erro ao buscar favoritos' });
   }
 });
@@ -543,7 +581,8 @@ app.get('/api/status', async (req, res) => {
       status: 'OK',
       database: 'Prisma SQLite',
       timestamp: new Date().toISOString(),
-      validacao: 'Zod ',
+      validacao: 'Zod ✅',
+      email: 'Nodemailer (Ethereal) 📧',
       estatisticas: {
         empresas: empresasCount,
         dadosFinanceiros: dadosCount,
@@ -563,11 +602,12 @@ app.get('/api/status', async (req, res) => {
         'Dados financeiros': 'Usuários autenticados',
         'Sistema de favoritos': 'Usuários autenticados',
         'Gestão administrativa': 'Apenas administradores',
-        'Validação Zod': 'Ativa em todas as rotas'
+        'Validação Zod': 'Ativa em todas as rotas',
+        'Envio de emails': 'Ativo (Ethereal Email)'
       }
     });
   } catch (error) {
-    console.error(' Erro ao buscar status:', error);
+    console.error('❌ Erro ao buscar status:', error);
     res.status(500).json({
       status: 'ERROR',
       message: error.message,
@@ -581,7 +621,7 @@ app.get('/api/status', async (req, res) => {
 // Listar todas as empresas com informações do criador (admin)
 app.get('/api/admin/empresas', authenticateToken, requireAdmin, async (req, res) => {
   try {
-    console.log(' Admin buscando todas as empresas com detalhes...');
+    console.log('🔒 Admin buscando todas as empresas com detalhes...');
     
     const empresas = await prisma.empresa.findMany({
       include: {
@@ -602,10 +642,10 @@ app.get('/api/admin/empresas', authenticateToken, requireAdmin, async (req, res)
       }
     });
     
-    console.log(` Admin - Encontradas ${empresas.length} empresas`);
+    console.log(`✅ Admin - Encontradas ${empresas.length} empresas`);
     res.json(empresas);
   } catch (error) {
-    console.error(' Erro ao buscar empresas (admin):', error);
+    console.error('❌ Erro ao buscar empresas (admin):', error);
     res.status(500).json({ message: 'Erro ao buscar empresas' });
   }
 });
@@ -613,7 +653,7 @@ app.get('/api/admin/empresas', authenticateToken, requireAdmin, async (req, res)
 // Estatísticas detalhadas (admin)
 app.get('/api/admin/stats', authenticateToken, requireAdmin, async (req, res) => {
   try {
-    console.log(' Admin buscando estatísticas detalhadas...');
+    console.log('📊 Admin buscando estatísticas detalhadas...');
     
     const stats = {
       usuarios: await prisma.usuario.count(),
@@ -675,7 +715,7 @@ app.get('/api/admin/stats', authenticateToken, requireAdmin, async (req, res) =>
     
     res.json(stats);
   } catch (error) {
-    console.error(' Erro ao buscar estatísticas:', error);
+    console.error('❌ Erro ao buscar estatísticas:', error);
     res.status(500).json({ message: 'Erro ao buscar estatísticas' });
   }
 });
@@ -689,7 +729,7 @@ app.get('/', (req, res) => {
 
 // Middleware para rotas não encontradas
 app.use((req, res) => {
-  console.log(` Rota não encontrada: ${req.method} ${req.path}`);
+  console.log(`❌ Rota não encontrada: ${req.method} ${req.path}`);
   res.status(404).json({ 
     message: 'Rota não encontrada',
     path: req.path,
@@ -699,7 +739,7 @@ app.use((req, res) => {
 
 // Middleware para tratamento de erros
 app.use((err, req, res, next) => {
-  console.error(' Erro no servidor:', err.message);
+  console.error('❌ Erro no servidor:', err.message);
   console.error('Stack:', err.stack);
   
   // Se é erro de validação do Prisma
@@ -725,18 +765,18 @@ app.use((err, req, res, next) => {
 // ====== GRACEFUL SHUTDOWN ======
 
 process.on('beforeExit', async () => {
-  console.log(' Desconectando do banco de dados...');
+  console.log('👋 Desconectando do banco de dados...');
   await prisma.$disconnect();
 });
 
 process.on('SIGINT', async () => {
-  console.log('\n Servidor interrompido. Desconectando Prisma...');
+  console.log('\n🛑 Servidor interrompido. Desconectando Prisma...');
   await prisma.$disconnect();
   process.exit(0);
 });
 
 process.on('SIGTERM', async () => {
-  console.log(' Servidor terminado. Desconectando Prisma...');
+  console.log('🛑 Servidor terminado. Desconectando Prisma...');
   await prisma.$disconnect();
   process.exit(0);
 });
@@ -744,5 +784,6 @@ process.on('SIGTERM', async () => {
 // ====== INICIALIZAÇÃO DO SERVIDOR ======
 
 app.listen(PORT, () => {
-  console.log(` URL: http://localhost:${PORT}`);
+  console.log(`\n📡 URL: http://localhost:${PORT}`);
+  console.log(`📊 Status: http://localhost:${PORT}/api/status`);
 });
