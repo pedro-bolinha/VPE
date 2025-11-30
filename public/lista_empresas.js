@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         cancelAddCompany: document.getElementById('cancelAddCompany'),
         submitAddCompany: document.getElementById('submitAddCompany'),
         userEmail: document.getElementById('userEmail')
-    };
+    }; 
 
     // Estado da aplicação
     let state = {
@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             updateUserInterface();
             await Promise.all([loadEmpresas(), loadFavoritos()]);
             setupEventListeners();
+            setupImageUpload();
         } catch (error) {
             console.error(' Init error:', error);
             showError('Erro ao carregar dados iniciais');

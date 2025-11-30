@@ -29,6 +29,7 @@ import {
   idParamSchema,
   updateUserSchema
 } from './src/middleware/validation.js';
+import { upload, handleMulterError } from './src/middleware/upload.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;

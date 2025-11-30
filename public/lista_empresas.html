@@ -142,26 +142,38 @@
                                        placeholder="100000" min="1000" step="1000">
                                 <small style="color: #999;">Quanto você busca de investimento</small>
                             </div>
-                            
-<div class="form-group">
+                          <div class="form-group">
   <label for="companyImg">Logo/Imagem da Empresa</label>
   <div class="file-upload-wrapper">
-    <input type="file" id="companyImg" name="image" 
+    <input type="file" 
+           id="companyImg" 
+           name="image" 
            accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
            style="display: none;">
-    <button type="button" id="uploadTrigger" class="upload-trigger-btn">
-      📷 Escolher Imagem
+    
+    <button type="button" 
+            id="uploadTrigger" 
+            class="upload-trigger-btn">
+      📷 Escolher Imagem do Computador
     </button>
-    <div id="imagePreview" class="image-preview" style="display: none;">
+    
+    <div id="imagePreview" 
+         class="image-preview" 
+         style="display: none;">
       <img id="previewImg" src="" alt="Preview">
-      <button type="button" id="removeImage" class="remove-image-btn">
-        🗑️ Remover
+      <button type="button" 
+              id="removeImage" 
+              class="remove-image-btn">
+        🗑️ Remover Imagem
       </button>
     </div>
   </div>
+  
   <small style="color: #999;">
-    Formatos aceitos: JPG, PNG, GIF, WEBP (máx. 5MB)
+    📎 Selecione uma imagem do seu computador<br>
+    Formatos: JPG, PNG, GIF, WEBP (máx. 5MB)
   </small>
+  
   <input type="hidden" id="uploadedImageUrl" name="img">
 </div>
                         </div>
