@@ -4,13 +4,14 @@ generator client {
 
 datasource db {
   provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
 model Empresa {
   id                Int                 @id @default(autoincrement())
   name              String
   descricao         String?
-  imagem            Imagem?
+  img               String?             // URL da imagem
   preco             Float
   setor             String?
   createdAt         DateTime            @default(now()) @map("created_at")
@@ -38,7 +39,7 @@ model Usuario {
   name              String
   email             String    @unique
   senhaHash         String    @map("senha_hash")
-  imgage            Imagem?  // Campo de avatar/imagem do usuário
+  img               String?   // URL do avatar
   cpfCnpj           String?   @map("cpf_cnpj")
   tipoUsuario       String    @default("investidor") @map("tipo_usuario")
   telefone1         String?
@@ -49,12 +50,6 @@ model Usuario {
   favoritos         Favorito[]
 
   @@map("usuarios")
-}
-model Imagem {
-  id     String @id @default(uuid())
-  path   String
-  usuario   Usuario   @relation(fields: [UsuarioId], references: [id])
-  Usuarioid String @unique
 }
 
 model Favorito {

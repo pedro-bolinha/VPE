@@ -256,7 +256,102 @@ app.delete('/api/usuarios/:id',
     }
   }
 );
+// ====== ADICIONAR ESTAS ROTAS ANTES DAS ROTAS DE EMPRESAS NO SERVER.JS ======
 
+// Criar pasta de uploads se não existir
+import fs from 'fs';
+const uploadsDir = path.join(__dirname, 'public/uploads/empresas');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+  console.log('📁 Pasta de uploads criada');
+}
+
+// Servir arquivos de upload
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+
+// ====== ROTA DE UPLOAD DE IMAGEM ======
+app.post('/api/upload/empresa-image', 
+  authenticateToken,
+  upload.single('image'),
+  handleMulterError,
+  async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          message: 'Nenhum arquivo enviado'
+        });
+      }
+
+      // URL da imagem
+      const imageUrl = `/uploads/empresas/${req.file.filename}`;
+      
+      console.log(`✅ Imagem enviada: ${req.file.filename}`);
+      console.log(`📷 URL: ${imageUrl}`);
+
+      res.json({
+        success: true,
+        message: 'Imagem enviada com sucesso',
+        imageUrl: imageUrl,
+        file: {
+          filename: req.file.filename,
+          url: imageUrl,
+          size: req.file.size,
+          mimetype: req.file.mimetype
+        }
+      });
+    } catch (error) {
+      console.error('❌ Erro no upload:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Erro ao fazer upload da imagem'
+      });
+    }
+  }
+);
+
+// ====== ROTA PARA UPLOAD DE AVATAR ======
+app.post('/api/upload/avatar',
+  authenticateToken,
+  upload.single('image'),
+  handleMulterError,
+  async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          message: 'Nenhum arquivo enviado'
+        });
+      }
+
+      const imageUrl = `/uploads/empresas/${req.file.filename}`;
+      
+      // Atualizar avatar do usuário
+      await prisma.usuario.update({
+        where: { id: req.user.id },
+        data: { img: imageUrl }
+      });
+
+      console.log(`✅ Avatar atualizado para usuário: ${req.user.email}`);
+
+      res.json({
+        success: true,
+        message: 'Avatar atualizado com sucesso',
+        url: imageUrl,
+        file: {
+          filename: req.file.filename,
+          url: imageUrl
+        }
+      });
+    } catch (error) {
+      console.error('❌ Erro ao atualizar avatar:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Erro ao atualizar avatar'
+      });
+    }
+  }
+);
 // ====== ROTAS DE EMPRESAS COM VALIDAÇÃO E EMAIL ======
 
 // Listar empresas (rota pública com auth opcional) - COM VALIDAÇÃO DE QUERY
