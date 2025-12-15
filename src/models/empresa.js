@@ -1,5 +1,19 @@
 import prisma from '../lib/prisma.js';
 
+// Substitui placeholders externos por imagem local para evitar requisições a domínios externos
+function sanitizeImageUrl(url) {
+  if (!url || url === '') return '/images/sem-imagem.svg';
+  try {
+    const lower = url.toLowerCase();
+    if (lower.includes('via.placeholder.com') || lower.includes('placeholder.com')) {
+      return '/images/sem-imagem.svg';
+    }
+    return url;
+  } catch (e) {
+    return '/images/sem-imagem.svg';
+  }
+}
+
 async function create({ name, descricao, img, preco, setor }) {
   if (!name || !preco) {
     throw new Error('Nome e preço são obrigatórios');
@@ -21,6 +35,8 @@ async function create({ name, descricao, img, preco, setor }) {
       }
     });
 
+    // Normalizar URL da imagem antes de retornar
+    empresa.img = sanitizeImageUrl(empresa.img);
     return empresa;
   } catch (error) {
     console.error('Erro ao criar empresa:', error);
@@ -53,6 +69,11 @@ async function read() {
           return meses[a.mes] - meses[b.mes];
         });
       }
+    });
+
+    // Normalizar URLs de imagem para evitar placeholders externos
+    empresas.forEach(e => {
+      e.img = sanitizeImageUrl(e.img);
     });
 
     return empresas;
@@ -95,6 +116,9 @@ async function readById(id) {
       });
     }
 
+    // Normalizar URL da imagem
+    empresa.img = sanitizeImageUrl(empresa.img);
+
     return empresa;
   } catch (error) {
     console.error('Erro ao buscar empresa por ID:', error);
@@ -129,6 +153,8 @@ async function update({ id, name, descricao, img, preco, setor }) {
       }
     });
 
+    // Normalizar URL da imagem antes de retornar
+    empresa.img = sanitizeImageUrl(empresa.img);
     return empresa;
   } catch (error) {
     console.error('Erro ao atualizar empresa:', error);

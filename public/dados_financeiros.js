@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', async function () {
+    // Usar imagens locais de fallback para evitar erros externos de DNS (e.g., via.placeholder.com)
     // Verificar autenticação obrigatória
     if (!auth.requireAuth()) {
         return;
@@ -90,7 +91,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             <h2>${empresaAtual.name}</h2>
             <img src="${empresaAtual.img}" 
                  alt="Imagem da ${empresaAtual.name}"
-                 onerror="this.src='https://via.placeholder.com/300x200?text=Sem+Imagem'">
+                 onerror="this.src='/images/sem-imagem.svg'">
             <p><strong>Descrição:</strong> ${empresaAtual.descricao || 'Descrição não disponível'}</p>
             <p><strong>Preço:</strong> R$ ${empresaAtual.preco.toLocaleString('pt-BR')}</p>
             <p><strong>Setor:</strong> ${empresaAtual.setor || 'Setor não informado'}</p>

@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', async function () {
+    // Substitui placeholders externos por imagens locais para evitar erros de DNS (via.placeholder.com)
     // Verificar autenticação
     if (!auth.requireAuth()) return;
 
@@ -308,9 +309,9 @@ async function submitAddCompanyForm(event) {
             
             return `
                 <div class="company" data-empresa-id="${empresa.id}">
-                    <img src="${empresa.img || 'https://via.placeholder.com/300x200?text=Empresa'}" 
+                    <img src="${empresa.img || '/images/sem-imagem.svg'}" 
                          alt="${empresa.name}" 
-                         onerror="this.src='https://via.placeholder.com/300x200?text=Sem+Imagem'">
+                         onerror="this.src='/images/sem-imagem.svg'">
                     
                     <div class="company-info">
                         <h3>${empresa.name}</h3>
@@ -438,9 +439,9 @@ async function submitAddCompanyForm(event) {
 
         const favoritosHTML = state.favoritos.map(favorito => `
             <div class="favorite-card">
-                <img src="${favorito.empresa.img || 'https://via.placeholder.com/80x80?text=Logo'}" 
+                <img src="${favorito.empresa.img || '/images/logo-placeholder-80.svg'}" 
                      alt="${favorito.empresa.name}"
-                     onerror="this.src='https://via.placeholder.com/80x80?text=N/A'">
+                     onerror="this.src='/images/logo-placeholder-80.svg'">
                 <div class="favorite-info">
                     <h4>${favorito.empresa.name}</h4>
                     <p>${favorito.empresa.setor || 'Setor não informado'} - R$ ${favorito.empresa.preco.toLocaleString('pt-BR')}</p>
@@ -642,8 +643,16 @@ async function submitAddCompanyForm(event) {
         return errors;
     }
 
-    // Verificar se URL é válida
+    // Verificar se URL é válida (aceita http(s), data: e caminhos relativos começando com `/`)
     function isValidUrl(string) {
+        if (!string || typeof string !== 'string') return false;
+
+        // Caminho relativo no próprio site (ex: /uploads/..., /images/...)
+        if (string.startsWith('/')) return true;
+
+        // Data URLs (quando o usuário arrasta imagem em base64)
+        if (string.startsWith('data:')) return true;
+
         try {
             const url = new URL(string);
             return ['http:', 'https:'].includes(url.protocol);
@@ -721,7 +730,7 @@ async function submitAddCompanyForm(event) {
             const companyData = {
                 name: formData.get('name')?.trim(),
                 descricao: formData.get('descricao')?.trim(),
-                img: formData.get('img')?.trim() || 'https://via.placeholder.com/300x200?text=Nova+Empresa',
+                img: formData.get('img')?.trim() || '/images/sem-imagem.svg',
                 preco: parseFloat(formData.get('preco')),
                 setor: formData.get('setor') || 'Outros'
             };

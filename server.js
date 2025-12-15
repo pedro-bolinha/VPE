@@ -272,7 +272,7 @@ if (!fs.existsSync(uploadsDir)) {
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
 // ====== ROTA DE UPLOAD DE IMAGEM PARA EMPRESAS ======
-app.post('/api/upload/empresa', 
+app.post(['/api/upload/empresa', '/api/upload/empresa-image'], 
   authenticateToken,
   (req, res, next) => {
     console.log('📤 Recebendo upload de imagem...');
