@@ -94,7 +94,12 @@ export const createEmpresaSchema = z.object({
       .max(100000000, "Preço máximo é R$ 100.000.000"),
     
     img: z.string()
-      .url("URL da imagem inválida")
+      .refine((val) => {
+        if (!val || val === '') return true; // Permite vazio
+        if (val.startsWith('/uploads/')) return true; // Permite URLs relativas
+        if (val.startsWith('http://') || val.startsWith('https://')) return true; // Permite URLs absolutas
+        return false;
+      }, "URL da imagem inválida")
       .optional()
       .or(z.literal('')),
     

@@ -256,38 +256,48 @@ app.delete('/api/usuarios/:id',
     }
   }
 );
-// ====== ADICIONAR ESTAS ROTAS ANTES DAS ROTAS DE EMPRESAS NO SERVER.JS ======
+// ===== ADICIONAR ESTAS ROTAS NO server.js =====
+// Colocar ANTES das rotas de empresas
 
 // Criar pasta de uploads se não existir
 import fs from 'fs';
+
 const uploadsDir = path.join(__dirname, 'public/uploads/empresas');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
   console.log('📁 Pasta de uploads criada');
 }
 
-// Servir arquivos de upload
+// Servir arquivos de upload (colocar após app.use(express.static))
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 
-// ====== ROTA DE UPLOAD DE IMAGEM ======
-app.post('/api/upload/empresa-image', 
+// ====== ROTA DE UPLOAD DE IMAGEM PARA EMPRESAS ======
+app.post('/api/upload/empresa', 
   authenticateToken,
+  (req, res, next) => {
+    console.log('📤 Recebendo upload de imagem...');
+    console.log('📋 Headers:', req.headers['content-type']);
+    next();
+  },
   upload.single('image'),
   handleMulterError,
   async (req, res) => {
     try {
       if (!req.file) {
+        console.log('❌ Nenhum arquivo recebido');
         return res.status(400).json({
           success: false,
           message: 'Nenhum arquivo enviado'
         });
       }
 
-      // URL da imagem
+      // URL da imagem (relativo ao public)
       const imageUrl = `/uploads/empresas/${req.file.filename}`;
       
-      console.log(`✅ Imagem enviada: ${req.file.filename}`);
-      console.log(`📷 URL: ${imageUrl}`);
+      console.log(`✅ Imagem enviada com sucesso!`);
+      console.log(`📷 Arquivo: ${req.file.filename}`);
+      console.log(`📏 Tamanho: ${(req.file.size / 1024).toFixed(2)} KB`);
+      console.log(`🔗 URL: ${imageUrl}`);
 
       res.json({
         success: true,
@@ -295,6 +305,7 @@ app.post('/api/upload/empresa-image',
         imageUrl: imageUrl,
         file: {
           filename: req.file.filename,
+          originalname: req.file.originalname,
           url: imageUrl,
           size: req.file.size,
           mimetype: req.file.mimetype
@@ -304,7 +315,8 @@ app.post('/api/upload/empresa-image',
       console.error('❌ Erro no upload:', error);
       res.status(500).json({
         success: false,
-        message: 'Erro ao fazer upload da imagem'
+        message: 'Erro ao fazer upload da imagem',
+        error: error.message
       });
     }
   }
@@ -326,7 +338,7 @@ app.post('/api/upload/avatar',
 
       const imageUrl = `/uploads/empresas/${req.file.filename}`;
       
-      // Atualizar avatar do usuário
+      // Atualizar avatar do usuário no banco
       await prisma.usuario.update({
         where: { id: req.user.id },
         data: { img: imageUrl }

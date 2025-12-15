@@ -64,115 +64,49 @@ document.addEventListener('DOMContentLoaded', async function () {
 // SUBSTITUIR A FUNÇÃO setupImageUpload() no lista_empresas.js
 
 // Estado para controle de upload
-let uploadedImageFile = null;
-let uploadedImageUrl = null;
+let imageUploader = null;
 
 // Configurar upload de imagem
 function setupImageUpload() {
-  const fileInput = document.getElementById('companyImg');
-  const uploadTrigger = document.getElementById('uploadTrigger');
-  const imagePreview = document.getElementById('imagePreview');
-  const previewImg = document.getElementById('previewImg');
+  console.log('🔧 Inicializando ImageUploader...');
+  imageUploader = new ImageUploader({
+    type: 'empresa',
+    inputId: 'companyImg',
+    previewId: 'imagePreview',
+    buttonId: 'uploadTrigger',
+    maxSize: 5 * 1024 * 1024, // 5MB
+    onSuccess: (file) => {
+      console.log('✅ Upload realizado:', file);
+      // O file.url contém a URL da imagem
+      const uploadedImageUrlInput = document.getElementById('uploadedImageUrl');
+      if (uploadedImageUrlInput) {
+        uploadedImageUrlInput.value = file.url;
+        console.log('📝 URL salva no input hidden:', file.url);
+      }
+    },
+    onError: (error) => {
+      console.error('❌ Erro no upload:', error);
+      showAlert(error.message || 'Erro no upload da imagem', 'error');
+    }
+  });
+
+  // Adicionar listener para o botão de remover
   const removeImageBtn = document.getElementById('removeImage');
-  const uploadedImageUrlInput = document.getElementById('uploadedImageUrl');
-
-  if (!fileInput || !uploadTrigger || !imagePreview || !previewImg || !removeImageBtn) {
-    console.warn('⚠️ Elementos de upload não encontrados');
-    return;
-  }
-
-  // Trigger para abrir seleção de arquivo
-  uploadTrigger.addEventListener('click', () => {
-    fileInput.click();
-  });
-
-  // Quando arquivo é selecionado
-  fileInput.addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    
-    if (!file) return;
-
-    // Validar tipo de arquivo
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) {
-      showAlert('Formato de imagem não suportado. Use JPG, PNG, GIF ou WEBP.', 'error');
-      fileInput.value = '';
-      return;
-    }
-
-    // Validar tamanho (5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      showAlert('Imagem muito grande. Tamanho máximo: 5MB', 'error');
-      fileInput.value = '';
-      return;
-    }
-
-    // Mostrar preview local
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      previewImg.src = e.target.result;
-      imagePreview.style.display = 'block';
-      uploadTrigger.style.display = 'none';
-    };
-    reader.readAsDataURL(file);
-
-    // Armazenar arquivo para upload posterior
-    uploadedImageFile = file;
-    uploadedImageUrl = null;
-    
-    console.log('📷 Imagem selecionada:', file.name);
-  });
-
-  // Remover imagem
-  removeImageBtn.addEventListener('click', () => {
-    fileInput.value = '';
-    uploadedImageFile = null;
-    uploadedImageUrl = null;
-    if (uploadedImageUrlInput) {
-      uploadedImageUrlInput.value = '';
-    }
-    imagePreview.style.display = 'none';
-    uploadTrigger.style.display = 'inline-flex';
-    
-    console.log('🗑️ Imagem removida');
-  });
-}
-
-// Função para fazer upload da imagem ANTES de criar empresa
-async function uploadCompanyImage() {
-  if (!uploadedImageFile) {
-    console.log('ℹ️ Nenhuma imagem para upload');
-    return null;
-  }
-
-  try {
-    const formData = new FormData();
-    formData.append('image', uploadedImageFile);
-
-    console.log('📤 Iniciando upload da imagem...');
-
-    const response = await fetch('/api/upload/empresa-image', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${auth.getToken()}`
-      },
-      body: formData
+  if (removeImageBtn) {
+    removeImageBtn.addEventListener('click', () => {
+      console.log('🗑️ Removendo imagem...');
+      imageUploader.reset();
+      const uploadedImageUrlInput = document.getElementById('uploadedImageUrl');
+      if (uploadedImageUrlInput) {
+        uploadedImageUrlInput.value = '';
+      }
+      // Esconder preview e mostrar botão
+      document.getElementById('imagePreview').style.display = 'none';
+      document.getElementById('uploadTrigger').style.display = 'inline-flex';
     });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Erro no upload');
-    }
-
-    const result = await response.json();
-    console.log('✅ Upload concluído:', result.imageUrl);
-    
-    return result.imageUrl;
-
-  } catch (error) {
-    console.error('❌ Erro no upload:', error);
-    throw error;
   }
+  
+  console.log('✅ ImageUploader inicializado');
 }
 
 // SUBSTITUIR a função submitAddCompanyForm
@@ -184,12 +118,14 @@ async function submitAddCompanyForm(event) {
     elements.submitAddCompany.disabled = true;
     elements.submitAddCompany.innerHTML = '⏳ Processando...';
 
-    // 1. Fazer upload da imagem primeiro (se houver)
+    // 1. Verificar se há imagem enviada
     let imageUrl = null;
-    if (uploadedImageFile) {
-      elements.submitAddCompany.innerHTML = '📷 Enviando imagem...';
-      imageUrl = await uploadCompanyImage();
-      console.log('✅ URL da imagem:', imageUrl);
+    const uploadedImageUrlInput = document.getElementById('uploadedImageUrl');
+    if (uploadedImageUrlInput && uploadedImageUrlInput.value) {
+      imageUrl = uploadedImageUrlInput.value;
+      console.log('✅ URL da imagem do input hidden:', imageUrl);
+    } else {
+      console.log('ℹ️ Nenhuma imagem foi enviada');
     }
 
     // 2. Coletar dados do formulário
@@ -197,7 +133,7 @@ async function submitAddCompanyForm(event) {
     const companyData = {
       name: formData.get('name')?.trim(),
       descricao: formData.get('descricao')?.trim(),
-      img: imageUrl || 'https://via.placeholder.com/300x200?text=Nova+Empresa',
+      img: imageUrl || '',
       preco: parseFloat(formData.get('preco')),
       setor: formData.get('setor') || 'Outros'
     };

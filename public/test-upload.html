@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Upload Imagem</title>
+</head>
+<body>
+    <h1>Teste de Upload de Imagem</h1>
+
+    <div id="uploadContainer">
+        <input type="file" id="testFile" accept="image/*">
+        <button onclick="testUpload()">Testar Upload</button>
+        <div id="result"></div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/imageUpload.js"></script>
+    <script>
+        async function testUpload() {
+            const fileInput = document.getElementById('testFile');
+            const resultDiv = document.getElementById('result');
+
+            if (!fileInput.files[0]) {
+                resultDiv.innerHTML = '❌ Selecione um arquivo primeiro';
+                return;
+            }
+
+            try {
+                resultDiv.innerHTML = '⏳ Fazendo upload...';
+
+                const formData = new FormData();
+                formData.append('image', fileInput.files[0]);
+
+                const response = await fetch('/api/upload/empresa-image', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${auth.getToken()}`
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultDiv.innerHTML = `✅ Upload bem-sucedido: ${data.imageUrl}`;
+                } else {
+                    resultDiv.innerHTML = `❌ Erro: ${data.message}`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Erro: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

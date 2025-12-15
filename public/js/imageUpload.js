@@ -82,6 +82,18 @@ class ImageUploader {
     
     // Preview da imagem
     this.showPreview(file);
+    
+    // Fazer upload automático da imagem
+    console.log('📤 Iniciando upload automático...');
+    this.upload().then(result => {
+      if (result) {
+        console.log('✅ Upload automático concluído:', result.url);
+      } else {
+        console.log('❌ Upload automático falhou');
+      }
+    }).catch(error => {
+      console.error('❌ Erro no upload automático:', error);
+    });
   }
   
   showPreview(file) {
@@ -92,6 +104,14 @@ class ImageUploader {
       if (img) {
         img.src = e.target.result;
         img.style.display = 'block';
+      }
+      
+      // Mostrar o preview
+      this.preview.style.display = 'flex';
+      
+      // Esconder o botão de upload
+      if (this.button) {
+        this.button.style.display = 'none';
       }
       
       // Mostrar nome e tamanho do arquivo
@@ -133,15 +153,17 @@ class ImageUploader {
       
       const endpoint = this.type === 'avatar' 
         ? '/api/upload/avatar' 
-        : '/api/upload/empresa';
+        : '/api/upload/empresa-image';
       
-      const response = await auth.authenticatedFetch(endpoint, {
+      // Para upload de arquivos, usar fetch diretamente (não authenticatedFetch)
+      // pois authenticatedFetch força Content-Type: application/json
+      const response = await fetch(endpoint, {
         method: 'POST',
-        body: formData,
-        // Remover Content-Type para o navegador definir automaticamente com boundary
         headers: {
           'Authorization': `Bearer ${auth.getToken()}`
-        }
+          // Não definir Content-Type para FormData
+        },
+        body: formData
       });
       
       const data = await response.json();
@@ -223,6 +245,10 @@ class ImageUploader {
     const fileInfo = this.preview.querySelector('.file-info');
     if (fileInfo) {
       fileInfo.remove();
+    }
+    this.preview.style.display = 'none';
+    if (this.button) {
+      this.button.style.display = 'inline-flex';
     }
   }
 }
