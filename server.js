@@ -870,6 +870,9 @@ app.use((err, req, res, next) => {
   });
 });
 
+// Exportar app para testes
+export default app;
+
 // ====== GRACEFUL SHUTDOWN ======
 
 process.on('beforeExit', async () => {
@@ -891,7 +894,9 @@ process.on('SIGTERM', async () => {
 
 // ====== INICIALIZAÇÃO DO SERVIDOR ======
 
-app.listen(PORT, () => {
-  console.log(`\n📡 URL: http://localhost:${PORT}`);
-  console.log(`📊 Status: http://localhost:${PORT}/api/status`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`\n📡 URL: http://localhost:${PORT}`);
+    console.log(`📊 Status: http://localhost:${PORT}/api/status`);
+  });
+}
